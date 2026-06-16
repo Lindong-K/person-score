@@ -2,217 +2,249 @@
 <html lang="zh-CN" data-theme="auto">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.json">
 <title>人际记分</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* ═══════ Tokens ═══════ */
 :root{
-  --bg:#f2f2f7;--card:#fff;--primary:#007AFF;--positive:#34C759;--negative:#FF3B30;
-  --text:#1c1c1e;--secondary:#8e8e93;--border:#e5e5ea;--shadow:0 1px 3px rgba(0,0,0,0.08);
-  --radius:12px;--avatar-bg:#e8f0fe;--safe-bottom:env(safe-area-inset-bottom,8px);
-  --modal-overlay:rgba(0,0,0,0.4);--warn:#FF9500;
+  --bg:#f2f2f7;--card:#fff;--cardAlt:#fafafc;--primary:#007AFF;--primaryLight:#e8f0fe;
+  --positive:#34C759;--positiveLight:#d4f5dd;--negative:#FF3B30;--negativeLight:#fdd;
+  --text:#1c1c1e;--text2:#6d6d72;--text3:#aeaeb2;--border:rgba(0,0,0,0.06);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04);--shadow:0 1px 4px rgba(0,0,0,0.06);
+  --shadow-lg:0 4px 16px rgba(0,0,0,0.1);--radius:14px;--radius-sm:10px;
+  --avatar-bg:#e8f0fe;--safe:env(safe-area-inset-bottom,8px);--overlay:rgba(0,0,0,0.35);
 }
 [data-theme="dark"]{
-  --bg:#1c1c1e;--card:#2c2c2e;--primary:#0A84FF;--positive:#32D74B;--negative:#FF453A;
-  --text:#e5e5ea;--secondary:#98989d;--border:#3a3a3c;--shadow:0 1px 3px rgba(0,0,0,0.4);
-  --avatar-bg:#1a3a5c;--modal-overlay:rgba(0,0,0,0.7);
+  --bg:#1c1c1e;--card:#2c2c2e;--cardAlt:#323234;--primary:#0A84FF;--primaryLight:#1a3a5c;
+  --positive:#32D74B;--positiveLight:#1a3a1a;--negative:#FF453A;--negativeLight:#3a1a1a;
+  --text:#e5e5ea;--text2:#8e8e93;--text3:#636366;--border:rgba(255,255,255,0.07);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);--shadow:0 1px 4px rgba(0,0,0,0.4);
+  --shadow-lg:0 4px 16px rgba(0,0,0,0.5);--avatar-bg:#1a3a5c;--overlay:rgba(0,0,0,0.65);
 }
+
+/* ═══════ Base ═══════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
   background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
-  -webkit-tap-highlight-color:transparent;user-select:none;height:100vh;height:100dvh;overflow:hidden;
-  transition:background 0.3s,color 0.3s;
+  -webkit-tap-highlight-color:transparent;user-select:none;height:100dvh;overflow:hidden;
+  transition:background 0.35s ease,color 0.35s ease;font-size:15px;line-height:1.5;
 }
-#app{max-width:480px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative}
-main{flex:1;overflow-y:auto;padding:20px 16px;padding-bottom:90px;-webkit-overflow-scrolling:touch;transition:background 0.3s}
-.screen{display:none}.screen.active{display:block}
-#tab-bar{display:flex;background:var(--card);border-top:1px solid var(--border);padding:6px 0 var(--safe-bottom);position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;z-index:100;transition:background 0.3s}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;border:none;background:none;color:var(--secondary);font-size:9px;padding:3px 0;cursor:pointer;transition:color 0.15s}
-.tab-btn.active{color:var(--primary)}.tab-icon{font-size:20px;line-height:1}
-.screen-title{font-size:26px;font-weight:800;margin-bottom:16px;letter-spacing:-0.3px}
-.card{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;box-shadow:var(--shadow);transition:background 0.3s,box-shadow 0.3s}
-.person-card{display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform 0.1s}
+#app{max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative}
+main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:touch}
+.screen{display:none;animation:fadeSlide 0.2s ease}.screen.active{display:block}
+
+/* ═══════ Tab Bar ═══════ */
+#tab-bar{display:flex;background:var(--card);border-top:1px solid var(--border);padding:5px 0 var(--safe);position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;padding:4px 0;cursor:pointer;transition:all 0.2s;position:relative}
+.tab-btn.active{color:var(--primary)}.tab-btn .tab-dot{position:absolute;top:0;width:4px;height:4px;border-radius:50%;background:var(--primary);opacity:0;transition:opacity 0.2s}
+.tab-btn.active .tab-dot{opacity:1}.tab-icon{font-size:20px;line-height:1}
+
+/* ═══════ Typography ═══════ */
+.screen-title{font-size:28px;font-weight:800;margin-bottom:18px;letter-spacing:-0.4px;color:var(--text);transition:color 0.3s}
+.section-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;margin-top:14px;text-transform:uppercase;letter-spacing:0.5px}.section-label:first-child{margin-top:0}
+.section-label .icon{margin-right:4px}
+
+/* ═══════ Cards ═══════ */
+.card{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow-sm);border:1px solid var(--border);transition:all 0.25s}
+.card-section{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.card-section>.section-label{margin-top:0;margin-bottom:10px;font-size:13px;color:var(--text)}
+
+/* ═══════ Person Card ═══════ */
+.person-card{display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform 0.15s}
 .person-card:active{transform:scale(0.98)}
-.avatar{width:42px;height:42px;border-radius:50%;background:var(--avatar-bg);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0;transition:background 0.3s}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--avatar-bg);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
 .person-info{flex:1;min-width:0;overflow:hidden}
-.person-name{font-size:16px;font-weight:600}
-.person-last-event{font-size:11px;color:var(--secondary);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.person-score-wrap{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
+.person-name{font-size:16px;font-weight:600;display:flex;align-items:center;gap:4px}
+.person-group-tag{font-size:9px;font-weight:500;color:var(--primary);background:var(--primaryLight);padding:1px 6px;border-radius:8px;white-space:nowrap}
+.person-last-event{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person-score-wrap{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:1px}
 .person-score{font-size:20px;font-weight:700}.person-score.pos{color:var(--positive)}.person-score.neg{color:var(--negative)}
-.sparkline{flex-shrink:0}
+.sparkline{flex-shrink:0;opacity:0.8}
 .quick-btns{display:flex;gap:4px;flex-shrink:0}
-.quick-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--card);transition:all 0.12s}
+.quick-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--card);transition:all 0.12s}
 .quick-btn.plus{color:var(--positive);border-color:var(--positive)}.quick-btn.minus{color:var(--negative);border-color:var(--negative)}
-.quick-btn:active{transform:scale(0.85)}
+.quick-btn:active{transform:scale(0.82)}
 
-/* Group filter */
-.group-filter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.group-chip{padding:5px 12px;border-radius:14px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;background:var(--card);color:var(--secondary);transition:all 0.12s;white-space:nowrap}
-.group-chip:active{transform:scale(0.95)}.group-chip.active{border-color:var(--primary);background:var(--primary);color:#fff}
+/* ═══════ Filter Chips ═══════ */
+.filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.filter-chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;background:var(--card);color:var(--text2);transition:all 0.15s;white-space:nowrap;font-weight:500}
+.filter-chip:active{transform:scale(0.95)}.filter-chip.active{border-color:var(--primary);background:var(--primary);color:#fff}
 
+/* ═══════ Record Form ═══════ */
 #person-list{margin-bottom:4px}
-.person-select-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.15s;background:var(--card);margin-bottom:6px}
-.person-select-item:active{transform:scale(0.98)}.person-select-item.selected{border-color:var(--primary);background:var(--avatar-bg)}
+.person-select-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;background:var(--card);margin-bottom:6px}
+.person-select-item:active{transform:scale(0.98)}.person-select-item.selected{border-color:var(--primary);background:var(--primaryLight)}
 .person-select-item .avatar-sm{width:34px;height:34px;border-radius:50%;background:var(--avatar-bg);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
 .person-select-item .item-name{font-size:15px;font-weight:500;flex:1}.person-select-item .item-score{font-size:14px;font-weight:600}
 .person-select-item .item-score.pos{color:var(--positive)}.person-select-item .item-score.neg{color:var(--negative)}
 
-.section-label{font-size:13px;font-weight:600;color:var(--secondary);margin-bottom:8px;margin-top:16px}.section-label:first-child{margin-top:0}
+/* ═══════ Inputs ═══════ */
+.date-input,.note-textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);-webkit-appearance:none;transition:all 0.2s}
+.date-input{height:44px}.date-input:focus,.note-textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primaryLight)}
+.note-textarea{min-height:56px;resize:none;line-height:1.5}.note-textarea::placeholder{color:var(--text3)}
 
-.date-input,.note-textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);-webkit-appearance:none;transition:background 0.3s,color 0.3s}
-.date-input{height:44px;margin-bottom:0}.date-input:focus,.note-textarea:focus{outline:none;border-color:var(--primary)}
-.note-textarea{min-height:56px;resize:none;line-height:1.4}.note-textarea::placeholder{color:#c7c7cc}
-
-/* Template chips */
 .tmpl-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.tmpl-chip{padding:4px 10px;border-radius:12px;border:1px dashed var(--border);font-size:12px;cursor:pointer;color:var(--secondary);transition:all 0.12s;white-space:nowrap}
-.tmpl-chip:active{background:var(--avatar-bg);color:var(--primary);border-color:var(--primary)}
+.tmpl-chip{padding:5px 12px;border-radius:14px;border:1px dashed var(--border);font-size:12px;cursor:pointer;color:var(--text2);transition:all 0.12s;white-space:nowrap;background:var(--cardAlt)}
+.tmpl-chip:active{background:var(--primaryLight);color:var(--primary);border-color:var(--primary)}
 
 .cat-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.cat-chip{padding:6px 12px;border-radius:16px;border:1.5px solid var(--border);font-size:13px;cursor:pointer;background:var(--card);color:var(--secondary);transition:all 0.12s;white-space:nowrap}
+.cat-chip{padding:6px 13px;border-radius:16px;border:1.5px solid var(--border);font-size:13px;cursor:pointer;background:var(--card);color:var(--text2);transition:all 0.12s;white-space:nowrap}
 .cat-chip:active{transform:scale(0.95)}.cat-chip.selected{border-color:var(--primary);background:var(--primary);color:#fff}
 
+/* ═══════ Score Presets ═══════ */
 .preset-row{display:flex;gap:6px;justify-content:center}
-.preset-btn{flex:1;max-width:58px;height:44px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);font-size:15px;font-weight:700;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;justify-content:center}
-.preset-btn:active{transform:scale(0.93)}.preset-btn.pos{color:var(--positive);border-color:#d1f0d9}.preset-btn.neg{color:var(--negative);border-color:#fdd}
+.preset-btn{flex:1;max-width:62px;height:46px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:15px;font-weight:700;cursor:pointer;transition:all 0.1s;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.preset-btn:active{transform:scale(0.93)}.preset-btn.pos{color:var(--positive)}.preset-btn.neg{color:var(--negative)}
 .preset-btn.selected.pos{background:var(--positive);color:#fff;border-color:var(--positive)}.preset-btn.selected.neg{background:var(--negative);color:#fff;border-color:var(--negative)}
-[data-theme="dark"] .preset-btn.pos{border-color:#1a4a1a}[data-theme="dark"] .preset-btn.neg{border-color:#4a1a1a}
 
-.custom-score-row{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:4px}
-.custom-score-label{font-size:13px;color:var(--secondary)}
-.custom-score-input{width:80px;height:40px;text-align:center;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-weight:600;background:var(--card);color:var(--text);-webkit-appearance:none;transition:background 0.3s,color 0.3s}
-.custom-score-input:focus{outline:none;border-color:var(--primary)}
+.custom-score-row{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:6px}
+.custom-score-label{font-size:13px;color:var(--text2)}
+.custom-score-input{width:84px;height:42px;text-align:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:17px;font-weight:600;background:var(--card);color:var(--text);-webkit-appearance:none;transition:all 0.2s}
+.custom-score-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primaryLight)}
 
-.btn-primary{width:100%;height:50px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-size:17px;font-weight:600;cursor:pointer;transition:opacity 0.12s;margin-top:16px}
-.btn-primary:active{opacity:0.8}.btn-primary:disabled{opacity:0.35;pointer-events:none}
-.btn-secondary{padding:8px 18px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:14px;cursor:pointer;color:var(--text)}.btn-secondary:active{opacity:0.7}
-.btn-danger{padding:6px 14px;background:none;border:1px solid var(--negative);border-radius:6px;color:var(--negative);font-size:13px;cursor:pointer}.btn-danger:active{background:rgba(255,59,48,0.1)}
-.btn-sm{height:36px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:500;border:none;cursor:pointer;background:var(--primary);color:#fff;white-space:nowrap}.btn-sm:active{opacity:0.8}.btn-sm.danger{background:var(--negative)}
+/* ═══════ Buttons ═══════ */
+.btn-primary{width:100%;height:52px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:17px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:14px;box-shadow:0 2px 8px rgba(0,122,255,0.25)}
+.btn-primary:active{opacity:0.85;transform:scale(0.98)}.btn-primary:disabled{opacity:0.3;pointer-events:none;box-shadow:none}
+.btn-secondary{padding:8px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;color:var(--text);font-weight:500;transition:all 0.12s}.btn-secondary:active{opacity:0.7}
+.btn-danger{padding:8px 14px;background:none;border:1px solid var(--negative);border-radius:8px;color:var(--negative);font-size:13px;cursor:pointer;font-weight:500}.btn-danger:active{background:var(--negativeLight)}
+.btn-sm{height:36px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:#fff;white-space:nowrap;transition:all 0.12s}.btn-sm:active{opacity:0.8}
 
-/* Toast */
-#toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-120px);background:#1c1c1e;color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:500;z-index:1000;transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);pointer-events:auto;display:flex;align-items:center;gap:10px}
+/* ═══════ Toast ═══════ */
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-130px);background:rgba(30,30,32,0.95);color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;font-weight:500;z-index:1000;transition:transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);pointer-events:auto;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.2)}
 #toast.show{transform:translateX(-50%) translateY(0)}#toast .undo-btn{color:#FFD60A;background:none;border:none;font-size:14px;font-weight:600;cursor:pointer;padding:0;white-space:nowrap}
 
-/* Modals */
-.modal-overlay{position:fixed;inset:0;background:var(--modal-overlay);display:flex;align-items:center;justify-content:center;z-index:500;animation:fadeIn 0.15s}
-.modal-box{background:var(--card);border-radius:14px;padding:24px 20px 20px;width:310px;max-height:90vh;overflow-y:auto;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.2);animation:scaleIn 0.2s}
+/* ═══════ Modals ═══════ */
+.modal-overlay{position:fixed;inset:0;background:var(--overlay);display:flex;align-items:center;justify-content:center;z-index:500;animation:fadeIn 0.2s;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.modal-box{background:var(--card);border-radius:16px;padding:24px 20px 20px;width:320px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:scaleIn 0.2s}
 .modal-msg{font-size:15px;margin-bottom:20px;line-height:1.5;text-align:center}
-.modal-actions{display:flex;gap:10px}.modal-actions button{flex:1;height:42px;border-radius:10px;border:none;font-size:15px;font-weight:500;cursor:pointer}
-.modal-cancel{background:var(--bg);color:var(--text)}.modal-confirm{background:var(--negative);color:#fff}.modal-primary{background:var(--primary);color:#fff}
-.modal-cancel:active,.modal-confirm:active,.modal-primary:active{opacity:0.8}
+.modal-actions{display:flex;gap:10px}.modal-actions button{flex:1;height:44px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.12s}
+.modal-cancel{background:var(--bg);color:var(--text)}.modal-cancel:active{opacity:0.7}
+.modal-confirm{background:var(--negative);color:#fff}.modal-confirm:active{opacity:0.8}
+.modal-primary{background:var(--primary);color:#fff}.modal-primary:active{opacity:0.8}
 
-.edit-score-row{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
-.edit-score-btn{width:44px;height:36px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;font-weight:600;cursor:pointer;background:var(--card);transition:all 0.12s;color:var(--text)}
+/* ═══════ Edit Modal ═══════ */
+.edit-score-row{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.edit-score-btn{width:44px;height:36px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;font-weight:600;cursor:pointer;background:var(--card);transition:all 0.1s;color:var(--text)}
 .edit-score-btn:active{transform:scale(0.93)}.edit-score-btn.pos{color:var(--positive)}.edit-score-btn.neg{color:var(--negative)}
 .edit-score-btn.selected.pos{background:var(--positive);color:#fff;border-color:var(--positive)}.edit-score-btn.selected.neg{background:var(--negative);color:#fff;border-color:var(--negative)}
-.edit-note{margin:8px 0}.edit-label{font-size:13px;color:var(--secondary);text-align:left;margin-bottom:4px}
+.edit-label{font-size:12px;font-weight:600;color:var(--text2);text-align:left;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
 
-/* Detail */
-.detail-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.back-btn{width:36px;height:36px;border:none;background:var(--card);border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);flex-shrink:0;color:var(--text)}.back-btn:active{background:var(--bg)}
-.detail-person-name{font-size:20px;font-weight:700;flex:1}.detail-total-score{font-size:24px;font-weight:700;flex-shrink:0}
+/* ═══════ Detail ═══════ */
+.detail-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.back-btn{width:38px;height:38px;border:none;background:var(--card);border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);flex-shrink:0;color:var(--text);transition:all 0.15s}.back-btn:active{background:var(--bg);transform:scale(0.94)}
+.detail-person-name{font-size:20px;font-weight:700;flex:1}.detail-total-score{font-size:26px;font-weight:800;flex-shrink:0}
 .detail-total-score.pos{color:var(--positive)}.detail-total-score.neg{color:var(--negative)}
 
-.person-note-wrap{margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
-.person-note-text{font-size:13px;color:var(--secondary);line-height:1.4;flex:1;cursor:pointer;padding:6px 10px;border-radius:8px;transition:background 0.15s;word-break:break-all}
-.person-note-text:active{background:var(--avatar-bg)}.person-note-text.placeholder{font-style:italic;opacity:0.6}
-.person-note-edit{flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--primary);border-radius:8px;background:var(--card);color:var(--text);font-family:inherit;resize:none;min-height:32px;-webkit-appearance:none}
-.person-note-edit:focus{outline:none}
+.person-note-text{font-size:13px;color:var(--text2);line-height:1.4;cursor:pointer;padding:10px 14px;border-radius:10px;background:var(--cardAlt);margin-bottom:12px;border:1px solid var(--border);transition:all 0.15s}
+.person-note-text:active{background:var(--primaryLight)}.person-note-text.placeholder{font-style:italic;opacity:0.5}
+.person-note-edit{width:100%;font-size:13px;padding:10px 14px;border:1.5px solid var(--primary);border-radius:10px;background:var(--card);color:var(--text);font-family:inherit;resize:none;min-height:64px;-webkit-appearance:none;margin-bottom:12px;transition:all 0.2s}.person-note-edit:focus{outline:none;box-shadow:0 0 0 3px var(--primaryLight)}
 
-/* Time filter */
-.time-filter{display:flex;gap:6px;margin-bottom:10px}
-.time-chip{padding:5px 12px;border-radius:14px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;background:var(--card);color:var(--secondary);transition:all 0.12s;white-space:nowrap}
-.time-chip:active{transform:scale(0.95)}.time-chip.active{border-color:var(--primary);background:var(--primary);color:#fff}
+/* ═══════ Search & Time Filter ═══════ */
+.search-wrap{position:relative;margin-bottom:8px;background:var(--bg);padding:2px 0}.search-input{width:100%;height:40px;padding:0 14px 0 36px;border:1px solid var(--border);border-radius:22px;font-size:14px;background:var(--card);color:var(--text);-webkit-appearance:none;transition:all 0.2s}
+.search-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primaryLight)}.search-wrap .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:0.5}
+.search-count{font-size:11px;color:var(--text2);text-align:center;padding-top:4px;display:none}.search-count.show{display:block}
 
-.search-wrap{position:relative;margin-bottom:10px}.search-input{width:100%;height:38px;padding:0 12px 0 34px;border:1px solid var(--border);border-radius:20px;font-size:14px;background:var(--card);color:var(--text);-webkit-appearance:none;transition:all 0.2s}
-.search-input:focus{outline:none;border-color:var(--primary)}.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
-.search-count{font-size:11px;color:var(--secondary);text-align:center;padding-top:4px;display:none}.search-count.show{display:block}
-
-.chart-wrap{background:var(--card);border-radius:var(--radius);padding:12px 8px 8px;margin-bottom:8px;box-shadow:var(--shadow);transition:background 0.3s;overflow:hidden}
+/* ═══════ Chart ═══════ */
+.chart-wrap{background:var(--card);border-radius:var(--radius);padding:12px 4px 4px;margin-bottom:10px;box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow:hidden}
 .chart-wrap text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
-.chart-wrap .grid-line{stroke:var(--border);stroke-width:0.5;stroke-dasharray:4 3}
-.chart-wrap .axis-line{stroke:var(--secondary);stroke-width:1}
-.chart-wrap .trend-line{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.chart-wrap .trend-dot{stroke:#fff;stroke-width:2}[data-theme="dark"] .chart-wrap .trend-dot{stroke:#2c2c2e}
+.chart-wrap .grid-line{stroke:var(--border);stroke-width:0.5;stroke-dasharray:5 4}
+.chart-wrap .axis-line{stroke:var(--text3);stroke-width:0.8}
 
+/* ═══════ Cat Stats ═══════ */
 .cat-stats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.cat-stat-chip{padding:5px 10px;border-radius:14px;font-size:12px;font-weight:500;white-space:nowrap}
-.cat-stat-chip.pos{background:#d4f5dd;color:#1a7a1a}.cat-stat-chip.neg{background:#fdd;color:#a00}
-[data-theme="dark"] .cat-stat-chip.pos{background:#1a3a1a;color:#32D74B}[data-theme="dark"] .cat-stat-chip.neg{background:#3a1a1a;color:#FF453A}
+.cat-stat-chip{padding:5px 12px;border-radius:14px;font-size:12px;font-weight:600;white-space:nowrap}
+.cat-stat-chip.pos{background:var(--positiveLight);color:var(--positive)}.cat-stat-chip.neg{background:var(--negativeLight);color:var(--negative)}
 
-/* Event card with swipe */
+/* ═══════ Event Cards ═══════ */
 .event-card-wrap{position:relative;overflow:hidden;margin-bottom:8px;border-radius:var(--radius)}
-.event-card-wrap .delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--negative);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;border-radius:0 var(--radius) var(--radius) 0}
-.event-card{display:flex;gap:12px;align-items:flex-start;cursor:pointer;position:relative;z-index:1;background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);transition:transform 0.2s,box-shadow 0.3s}
-.event-card:active{opacity:0.7}
-.event-score{width:50px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.event-card-wrap .delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--negative);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;border-radius:0 var(--radius) var(--radius) 0;transition:opacity 0.2s;opacity:0}
+.event-card-wrap.swiping .delete-bg{opacity:1}
+.event-card{display:flex;gap:12px;align-items:flex-start;cursor:pointer;position:relative;z-index:1;background:var(--card);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);transition:transform 0.2s ease}
+.event-card:active{opacity:0.8}
+.event-score{width:48px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
 .event-score.pos{background:var(--positive)}.event-score.neg{background:var(--negative)}
 .event-body{flex:1;min-width:0}.event-note{font-size:15px;line-height:1.4;word-break:break-all}
-.event-meta{display:flex;align-items:center;gap:8px;margin-top:3px}
-.event-cat-badge{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--avatar-bg);color:var(--primary);font-weight:500}
-.event-date{font-size:12px;color:var(--secondary)}
-.event-del-btn{background:none;border:none;color:#c7c7cc;font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}.event-del-btn:active{color:var(--negative)}
-.swipe-hint{font-size:10px;color:var(--secondary);text-align:center;margin-bottom:4px}
+.event-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
+.event-cat-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--primaryLight);color:var(--primary);font-weight:600}
+.event-date{font-size:11px;color:var(--text2)}
+.event-del-btn{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;opacity:0;transition:opacity 0.15s}
+.event-card-wrap:hover .event-del-btn,.event-card-wrap.swiping .event-del-btn{opacity:1}
+.event-del-btn:active{color:var(--negative)}
+.swipe-hint{font-size:10px;color:var(--text3);text-align:center;margin-bottom:6px;letter-spacing:0.5px}
 
-.empty-state{text-align:center;padding:40px 16px;color:var(--secondary)}.empty-icon{font-size:48px;margin-bottom:12px}.empty-text{font-size:15px;line-height:1.5}
+/* ═══════ Insights ═══════ */
+.summary-grid{display:flex;gap:8px;margin-bottom:4px}
+.summary-stat{flex:1;background:var(--cardAlt);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1px solid var(--border)}
+.summary-stat .big{font-size:26px;font-weight:800}.summary-stat .lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.compare-selectors{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.compare-select{flex:1;height:42px;padding:0 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--card);color:var(--text);-webkit-appearance:none;font-weight:500}
+.compare-vs{font-weight:800;color:var(--text3);font-size:13px;flex-shrink:0}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.compare-box{padding:14px;border-radius:var(--radius-sm);background:var(--cardAlt);text-align:center;border:1px solid var(--border)}
+.compare-box .val{font-size:26px;font-weight:800}.compare-box .lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.compare-cat-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;font-size:13px;border-radius:6px}.compare-cat-row:nth-child(odd){background:var(--cardAlt)}
 
+/* ═══════ Settings ═══════ */
+.section-card{background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:14px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.section-card .sc-title{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:6px}
+.section-card .sc-icon{font-size:18px}
+.manage-person-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}.manage-person-row+.manage-person-row{border-top:1px solid var(--border)}
+.manage-person-name{font-size:15px;font-weight:500}
+.group-sel{height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--text)}
+.text-input{flex:1;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;-webkit-appearance:none;background:var(--card);color:var(--text)}.text-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primaryLight)}
 .input-row{display:flex;gap:8px}
-.text-input{flex:1;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;-webkit-appearance:none;background:var(--card);color:var(--text)}.text-input:focus{outline:none;border-color:var(--primary)}
+.theme-row,.opt-row{display:flex;gap:5px;background:var(--bg);border-radius:10px;padding:3px}
+.theme-opt{flex:1;text-align:center;padding:9px 4px;border-radius:8px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--text2);font-weight:500;transition:all 0.15s}
+.theme-opt.active{background:var(--card);color:var(--text);font-weight:600;box-shadow:var(--shadow-sm)}
+.manage-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.manage-chip{padding:5px 26px 5px 11px;border-radius:14px;border:1.5px solid var(--border);font-size:12px;background:var(--card);position:relative;font-weight:500;transition:all 0.12s}
+.manage-chip .rm{position:absolute;right:5px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:14px;opacity:0.35;line-height:1;padding:2px}.manage-chip .rm:hover{opacity:1;color:var(--negative)}
 
-.manage-person-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0}.manage-person-row+.manage-person-row{border-top:1px solid var(--border)}.manage-person-name{font-size:15px;font-weight:500}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+.toggle-row .tl{font-size:14px;color:var(--text)}.toggle-row .tv{font-size:13px;color:var(--text2)}
+.toggle-sw{width:50px;height:30px;border-radius:15px;background:var(--border);cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-sw.on{background:var(--positive)}.toggle-sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle-sw.on::after{transform:translateX(20px)}
 
-.settings-section{margin-top:24px}.settings-section-title{font-size:13px;font-weight:600;color:var(--secondary);margin-bottom:10px}
-.data-btn-row{display:flex;gap:8px;flex-wrap:wrap}.data-btn-row button{flex:1;min-width:100px}
+/* ═══════ Empty States ═══════ */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}.empty-icon{font-size:44px;margin-bottom:10px;opacity:0.7}.empty-text{font-size:14px;line-height:1.6}
 
-.theme-row{display:flex;gap:6px;background:var(--bg);border-radius:10px;padding:4px}
-.theme-opt{flex:1;text-align:center;padding:8px 4px;border-radius:8px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--secondary)}
-.theme-opt.active{background:var(--card);color:var(--text);font-weight:600;box-shadow:var(--shadow)}
+/* ═══════ PIN ═══════ */
+#pin-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:background 0.3s}
+#pin-screen.hidden{display:none}.pin-icon{font-size:52px}.pin-title{font-size:18px;font-weight:700;color:var(--text)}.pin-subtitle{font-size:13px;color:var(--text2)}
+.pin-dots{display:flex;gap:18px}.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all 0.2s;background:transparent}
+.pin-dot.filled{background:var(--primary);border-color:var(--primary)}.pin-dot.shake{animation:shake 0.4s ease}
+.pin-pad{display:grid;grid-template-columns:repeat(3,66px);gap:8px}
+.pin-key{width:66px;height:54px;border-radius:27px;border:1px solid var(--border);background:var(--card);font-size:22px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:all 0.1s}
+.pin-key:active{background:var(--border);transform:scale(0.95)}.pin-key.empty{border:none;background:none;font-size:15px;color:var(--text2)}
+.pin-actions{display:flex;gap:12px;margin-top:4px}
+.pin-actions button{padding:8px 24px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;transition:all 0.12s}
+.pin-actions button:active{background:var(--bg)}
 
-/* Comparison */
-.compare-selectors{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-.compare-select{flex:1;height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--card);color:var(--text);-webkit-appearance:none}
-.compare-vs{font-weight:700;color:var(--secondary);font-size:14px}
-.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.compare-stat{padding:10px;border-radius:10px;background:var(--card);text-align:center;border:1px solid var(--border)}
-.compare-stat .val{font-size:22px;font-weight:700}.compare-stat .lbl{font-size:11px;color:var(--secondary);margin-top:2px}
-.compare-cats{margin-top:8px}.compare-cat-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes scaleIn{from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
-/* Summary */
-.summary-card{margin-bottom:12px}
-.summary-title{font-size:15px;font-weight:700;margin-bottom:6px}
-.summary-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid var(--border)}
-.summary-row .label{color:var(--secondary)}.summary-empty{color:var(--secondary);font-size:13px;text-align:center;padding:12px}
-
-/* PIN */
-#pin-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:background 0.3s}
-#pin-screen.hidden{display:none}.pin-icon{font-size:56px}.pin-title{font-size:18px;font-weight:600;color:var(--text)}.pin-subtitle{font-size:14px;color:var(--secondary)}
-.pin-dots{display:flex;gap:16px}.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);transition:all 0.2s;background:transparent}
-.pin-dot.filled{background:var(--primary);border-color:var(--primary)}.pin-dot.shake{animation:shakeDots 0.4s ease}
-.pin-pad{display:grid;grid-template-columns:repeat(3,70px);gap:10px}
-.pin-key{width:70px;height:56px;border-radius:28px;border:1px solid var(--border);background:var(--card);font-size:24px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:all 0.12s}
-.pin-key:active{background:var(--border);transform:scale(0.94)}.pin-key.empty{border:none;background:none;font-size:16px;color:var(--secondary)}
-
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes scaleIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
-@keyframes shakeDots{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
-
-@media(min-width:480px){body{background:#e8e8ed}[data-theme="dark"] body{background:#000}#app{box-shadow:0 0 40px rgba(0,0,0,0.15)}}
+@media(min-width:480px){body{background:#e8e8ed}[data-theme="dark"] body{background:#000}#app{box-shadow:0 0 60px rgba(0,0,0,0.18)}}
 </style>
 </head>
 <body>
 <div id="app">
 <div id="pin-screen" class="hidden">
 <div class="pin-icon">🔐</div><div class="pin-title" id="pin-title">输入密码</div><div class="pin-subtitle" id="pin-subtitle"></div>
-<div class="pin-dots" id="pin-dots"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+<div class="pin-dots" id="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div>
 <div class="pin-pad" id="pin-pad"></div>
+<div class="pin-actions" id="pin-cancel-area"><button id="pin-cancel-btn">取消</button></div>
 </div>
 
 <main>
-<!-- Record -->
+<!-- ═══════ Record ═══════ -->
 <div id="screen-record" class="screen active">
-<div class="screen-title">📝 记录事件</div>
+<div class="screen-title">记录事件</div>
 <div id="person-list"></div>
 <div class="section-label">发生日期</div><input type="date" id="event-date" class="date-input">
 <div class="section-label">事件备注</div><textarea id="note-input" class="note-textarea" placeholder="TA做了什么...（可选）"></textarea>
@@ -224,65 +256,64 @@ main{flex:1;overflow-y:auto;padding:20px 16px;padding-bottom:90px;-webkit-overfl
 <button id="save-btn" class="btn-primary" disabled>保存记录</button>
 </div>
 
-<!-- People -->
+<!-- ═══════ People ═══════ -->
 <div id="screen-people" class="screen">
-<div class="screen-title">👥 人物列表</div>
-<div class="group-filter" id="group-filter"></div>
+<div class="screen-title">人物列表</div>
+<div id="group-filter" class="filter-row"></div>
 <div id="people-list"></div>
 </div>
 
-<!-- Insights -->
+<!-- ═══════ Insights ═══════ -->
 <div id="screen-insights" class="screen">
-<div class="screen-title">📊 洞察</div>
-<div id="summary-week" class="summary-card card"></div>
-<div id="summary-month" class="summary-card card"></div>
-<div class="card">
-<div class="summary-title">人物对比</div>
-<div class="compare-selectors">
-<select class="compare-select" id="compare-a"></select>
-<span class="compare-vs">VS</span>
-<select class="compare-select" id="compare-b"></select>
-</div>
+<div class="screen-title">数据洞察</div>
+<div class="summary-grid" id="summary-stats"></div>
+<div id="summary-week" class="card-section"></div>
+<div id="summary-month" class="card-section"></div>
+<div class="card-section">
+<div class="section-label">人物对比</div>
+<div class="compare-selectors"><select class="compare-select" id="compare-a"></select><span class="compare-vs">VS</span><select class="compare-select" id="compare-b"></select></div>
 <div id="compare-result"></div>
 </div>
 </div>
 
-<!-- Settings -->
+<!-- ═══════ Settings ═══════ -->
 <div id="screen-settings" class="screen">
-<div class="screen-title">⚙️ 设置</div>
-<div class="section-label">添加人物</div>
-<div class="input-row"><input type="text" id="new-person-input" class="text-input" placeholder="输入姓名" maxlength="20"><button id="add-person-btn" class="btn-sm">添加</button></div>
-<div class="settings-section"><div class="settings-section-title">管理人物</div><div id="manage-people-list"></div></div>
-<div class="settings-section"><div class="settings-section-title">快捷打分分值</div>
-<div class="theme-row" id="qscore-selector"><button class="theme-opt" data-v="1">±1</button><button class="theme-opt" data-v="3">±3</button><button class="theme-opt" data-v="5">±5</button><button class="theme-opt" data-v="10">±10</button></div></div>
-<div class="settings-section"><div class="settings-section-title">管理分类标签</div><div id="cat-mgr"></div></div>
-<div class="settings-section"><div class="settings-section-title">快捷备注模板</div><div id="tmpl-mgr"></div></div>
-<div class="settings-section"><div class="settings-section-title">外观</div>
-<div class="theme-row" id="theme-selector"><button class="theme-opt" data-theme="auto">跟随系统</button><button class="theme-opt" data-theme="light">浅色</button><button class="theme-opt" data-theme="dark">深色</button></div></div>
-<div class="settings-section"><div class="settings-section-title">安全</div>
-<button id="pin-setup-btn" class="btn-secondary" style="width:100%;">🔐 设置应用密码</button>
+<div class="screen-title">设置</div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">👤</span>添加人物</div><div class="input-row"><input type="text" id="new-person-input" class="text-input" placeholder="输入姓名" maxlength="20"><button id="add-person-btn" class="btn-sm">添加</button></div></div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">📋</span>管理人物</div><div id="manage-people-list"></div></div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">⚡</span>快捷设置</div>
+<div class="section-label">快捷打分分值</div><div class="opt-row" id="qscore-row"><button class="theme-opt" data-v="1">±1</button><button class="theme-opt" data-v="3">±3</button><button class="theme-opt" data-v="5">±5</button><button class="theme-opt" data-v="10">±10</button></div>
+<div class="toggle-row" style="margin-top:14px;"><span class="tl">触感反馈</span><div class="toggle-sw on" id="vibrate-toggle"></div></div></div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">🏷️</span>自定义管理</div>
+<div class="section-label">分类标签</div><div class="input-row"><input type="text" id="new-cat-input" class="text-input" placeholder="新分类名" maxlength="10"><button id="add-cat-btn" class="btn-sm">添加</button></div><div id="cat-list" class="manage-chips"></div>
+<div class="section-label">备注模板</div><div class="input-row"><input type="text" id="new-tmpl-input" class="text-input" placeholder="模板内容" maxlength="30"><button id="add-tmpl-btn" class="btn-sm">添加</button></div><div id="tmpl-list" class="manage-chips"></div>
+<div class="section-label">人物分组</div><div class="input-row"><input type="text" id="new-group-input" class="text-input" placeholder="新分组名" maxlength="10"><button id="add-group-btn" class="btn-sm">添加</button></div><div id="group-list" class="manage-chips"></div></div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">🎨</span>外观</div>
+<div class="opt-row" id="theme-row"><button class="theme-opt" data-theme="auto">跟随系统</button><button class="theme-opt" data-theme="light">浅色</button><button class="theme-opt" data-theme="dark">深色</button></div></div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">🔐</span>安全</div>
+<button id="pin-setup-btn" class="btn-secondary" style="width:100%;">设置应用密码</button>
 <button id="pin-remove-btn" class="btn-danger" style="width:100%;margin-top:8px;display:none;">移除密码</button></div>
-<div class="settings-section"><div class="settings-section-title">数据管理</div>
+<div class="section-card"><div class="sc-title"><span class="sc-icon">💾</span>数据管理</div>
 <div class="data-btn-row"><button id="export-btn" class="btn-secondary">导出备份</button><button id="import-btn" class="btn-secondary">导入备份</button></div>
-<button id="reset-btn" class="btn-danger" style="margin-top:12px;width:100%;">清除全部数据</button></div>
+<button id="reset-btn" class="btn-danger" style="margin-top:10px;width:100%;">清除全部数据</button></div>
 </div>
 
-<!-- Detail -->
+<!-- ═══════ Detail ═══════ -->
 <div id="screen-detail" class="screen">
 <div class="detail-header"><button class="back-btn">←</button><span class="detail-person-name"></span><span class="detail-total-score"></span></div>
 <div id="person-note-area"></div><div id="detail-chart"></div><div id="detail-cat-stats" class="cat-stats"></div>
-<div class="time-filter" id="time-filter"></div>
-<div class="search-wrap"><input type="search" id="event-search" class="search-input" placeholder="搜索事件..."><div class="search-count" id="search-count"></div></div>
+<div id="time-filter" class="filter-row"></div>
+<div class="search-wrap"><span class="search-icon">🔍</span><input type="search" id="event-search" class="search-input" placeholder="搜索事件..."><div class="search-count" id="search-count"></div></div>
 <div class="swipe-hint">← 左滑删除</div>
 <div id="events-list"></div>
 </div>
 </main>
 
 <nav id="tab-bar">
-<button class="tab-btn active" data-tab="record"><span class="tab-icon">📝</span>记录</button>
-<button class="tab-btn" data-tab="people"><span class="tab-icon">👥</span>人物</button>
-<button class="tab-btn" data-tab="insights"><span class="tab-icon">📊</span>洞察</button>
-<button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span>设置</button>
+<button class="tab-btn active" data-tab="record"><span class="tab-dot"></span><span class="tab-icon">📝</span>记录</button>
+<button class="tab-btn" data-tab="people"><span class="tab-dot"></span><span class="tab-icon">👥</span>人物</button>
+<button class="tab-btn" data-tab="insights"><span class="tab-dot"></span><span class="tab-icon">📊</span>洞察</button>
+<button class="tab-btn" data-tab="settings"><span class="tab-dot"></span><span class="tab-icon">⚙️</span>设置</button>
 </nav>
 
 <div id="toast"><span id="toast-msg"></span></div>
@@ -293,206 +324,194 @@ main{flex:1;overflow-y:auto;padding:20px 16px;padding-bottom:90px;-webkit-overfl
 'use strict';
 
 const DEF_CATS=['守信','帮忙','靠谱','大方','失信','添乱','掉链子','小气','冷漠','其他'];
-const GROUPS=['全部','朋友','同事','家人','同学','其他'];
+const DEF_GROUPS=['朋友','同事','家人','同学','其他'];
+const DEF_TMPLS=['主动帮忙','答应又忘了','一起吃饭','借了东西','背后说我','说到做到'];
+const MAX_UNDO=5,MAX_CHART_DOTS=18;
 
-let data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[]}};
-let currentTab='record',detailPersonId=null,selectedPersonId=null;
-let currentScore=null,currentCategory='其他',lastEventId=null;
-let pinMode=null,pinEntry='',pinFirst='';
-let unlocked=sessionStorage.getItem('ps_unlocked')==='1';
-let toastTimer=null,searchQuery='',timeFilter='全部',groupFilter='全部',swipeX=0,swipeId=null;
+let data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:true}};
+let currentTab='record',detailPersonId=null,selectedPersonId=null,undoStack=[];
+let currentScore=null,currentCategory='其他',pinMode=null,pinEntry='',pinFirst='';
+let unlocked=sessionStorage.getItem('ps_u')==='1',toastTimer=null,searchQuery='',timeFilter='全部',groupFilter='全部';
 
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
-// ── Theme ─────────────────────────
-function applyTheme(){
-  const t=data.settings.theme;
-  document.documentElement.setAttribute('data-theme',t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t);
-}
-window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(data.settings.theme==='auto')applyTheme()});
+// ═══ Theme ════════════════════════
+function applyTheme(){const t=data.settings.theme;document.documentElement.setAttribute('data-theme',t==='auto'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t)}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(data.settings.theme==='auto')applyTheme()});
 
-// ── Persistence ───────────────────
+// ═══ Persistence ═════════════════
 function load(){
-  try{
-    const raw=localStorage.getItem('ps_data');if(raw){
-      data=JSON.parse(raw);
-      if(!data.settings)data.settings={pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[]};
-      if(!data.settings.theme)data.settings.theme='auto';
-      if(data.settings.pin===undefined)data.settings.pin=null;
-      if(!data.settings.quickScore)data.settings.quickScore=5;
-      if(!data.settings.categories)data.settings.categories=[...DEF_CATS];
-      if(!data.settings.noteTemplates)data.settings.noteTemplates=[];
-    }
+  try{const raw=localStorage.getItem('ps_data');if(raw){data=JSON.parse(raw);migrate()}}catch(e){initDefaults()}
+  function initDefaults(){data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:true}}}
+  function migrate(){
+    const s=data.settings;if(!s)s={};s.theme=s.theme||'auto';s.quickScore=s.quickScore||5;
+    s.categories=s.categories||[...DEF_CATS];s.noteTemplates=s.noteTemplates||[...DEF_TMPLS];
+    s.groups=s.groups||[...DEF_GROUPS];if(s.vibrate===undefined)s.vibrate=true;
+    if(s.pin===undefined)s.pin=null;data.settings=s;
     data.events.forEach(e=>{if(!e.category)e.category='其他'});
-    data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group)p.group='其他'});
-  }catch(e){data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[]}}}
+    data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group||!s.groups.includes(p.group))p.group='其他'});
+  }
 }
-function save(){localStorage.setItem('ps_data',JSON.stringify(data))}
+function save(){const exp={...data,settings:{...data.settings,pin:data.settings.pin}};localStorage.setItem('ps_data',JSON.stringify(exp))}
 
-// ── Helpers ───────────────────────
+// ═══ Helpers ═════════════════════
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function getPerson(id){return data.people.find(p=>p.id===id)}
 function getScore(pid){return data.events.filter(e=>e.personId===pid).reduce((s,e)=>s+e.score,0)}
 function getEvents(pid){return data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))}
-function getLastEvent(pid){const evts=getEvents(pid);return evts.length>0?evts[0]:null}
-function fmtDate(iso){const d=new Date(iso),n=new Date(),df=n-d;const m=Math.floor(df/60000),h=Math.floor(df/3600000),day=Math.floor(df/86400000);if(m<1)return'刚刚';if(m<60)return m+'分钟前';if(h<24)return h+'小时前';if(day<7)return day+'天前';const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');return y===n.getFullYear()?mo+'-'+da:y+'-'+mo+'-'+da}
+function getLastEvent(pid){const ev=getEvents(pid);return ev.length>0?ev[0]:null}
+function fmtDate(iso){const d=new Date(iso),n=new Date(),df=n-d,m=Math.floor(df/6e4),h=Math.floor(df/36e5),day=Math.floor(df/864e5);if(m<1)return'刚刚';if(m<60)return m+'分钟前';if(h<24)return h+'小时前';if(day<7)return day+'天前';const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');return y===n.getFullYear()?mo+'-'+da:y+'-'+mo+'-'+da}
 function fmtDateFull(iso){const d=new Date(iso);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function scoreClass(n){return n>0?'pos':n<0?'neg':''}
 function scoreText(n){return(n>0?'+':'')+n}
 function todayStr(){return new Date().toISOString().slice(0,10)}
-function weekAgo(){const d=new Date();d.setDate(d.getDate()-7);return d.toISOString().slice(0,10)}
-function monthAgo(){const d=new Date();d.setMonth(d.getMonth()-1);return d.toISOString().slice(0,10)}
-function threeMonthAgo(){const d=new Date();d.setMonth(d.getMonth()-3);return d.toISOString().slice(0,10)}
+// Correct time semantics
+function weekStart(){const d=new Date();const day=d.getDay();const diff=d.getDate()-(day===0?6:day-1);d.setDate(diff);d.setHours(0,0,0,0);return d}
+function monthStart(){const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d}
+function monthsAgo(n){const d=new Date();d.setMonth(d.getMonth()-n);return d}
 function getCats(){return data.settings.categories||DEF_CATS}
+function getGroups(){const gs=data.settings.groups||DEF_GROUPS;return['全部',...gs]}
+function haptic(){try{if(data.settings.vibrate!==false)navigator.vibrate(8)}catch(e){}}
 
-// ── Haptic ────────────────────────
-function haptic(){try{navigator.vibrate(10)}catch(e){}}
-
-// ── Toast ─────────────────────────
+// ═══ Toast ═══════════════════════
 function toast(msg,undoAction){
-  const el=$('#toast');$('#toast-msg').textContent=msg;
-  const ub=el.querySelector('.undo-btn');if(ub)ub.remove();
-  if(undoAction){const btn=document.createElement('button');btn.className='undo-btn';btn.textContent='撤销';btn.onclick=()=>{undoAction();hideToast()};el.appendChild(btn)}
-  el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),undoAction?3000:2000);
+  $('#toast-msg').textContent=msg;const ub=$('#toast').querySelector('.undo-btn');if(ub)ub.remove();
+  if(undoAction){const b=document.createElement('button');b.className='undo-btn';b.textContent='撤销';b.onclick=()=>{undoAction();hideToast()};$('#toast').appendChild(b)}
+  $('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),undoAction?3500:2000);
 }
 function hideToast(){$('#toast').classList.remove('show');clearTimeout(toastTimer)}
 
-// ── Confirm ───────────────────────
-function confirmDialog(msg,ctxt,cls){return new Promise(r=>{const ov=document.createElement('div');ov.className='modal-overlay';ov.innerHTML=`<div class="modal-box"><div class="modal-msg">${msg}</div><div class="modal-actions"><button class="modal-cancel">取消</button><button class="${cls||'modal-confirm'}">${ctxt||'确定'}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();r(false)};ov.querySelector('.modal-actions button:last-child').onclick=()=>{ov.remove();r(true)};ov.onclick=(e)=>{if(e.target===ov){ov.remove();r(false)}}})}
+// ═══ Confirm ═════════════════════
+function confirmDialog(msg,ctxt,cls){return new Promise(r=>{const ov=document.createElement('div');ov.className='modal-overlay';ov.innerHTML=`<div class="modal-box"><div class="modal-msg">${msg}</div><div class="modal-actions"><button class="modal-cancel">取消</button><button class="${cls||'modal-confirm'}">${ctxt||'确定'}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();r(false)};ov.querySelector('.modal-actions button:last-child').onclick=()=>{ov.remove();r(true)};ov.onclick=e=>{if(e.target===ov){ov.remove();r(false)}}})}
 
-// ── PIN ───────────────────────────
+// ═══ PIN ═════════════════════════
 function initPinScreen(){
   $('#pin-pad').innerHTML=[1,2,3,4,5,6,7,8,9,'清',0,'⌫'].map(k=>k==='清'||k==='⌫'?`<div class="pin-key empty" data-key="${k}">${k}</div>`:`<div class="pin-key" data-key="${k}">${k}</div>`).join('');
-  $('#pin-pad').onclick=(e)=>{const k=e.target.dataset.key;if(!k)return;if(k==='清'){pinEntry='';updateDots();return}if(k==='⌫'){pinEntry=pinEntry.slice(0,-1);updateDots();return}if(pinEntry.length>=4)return;pinEntry+=k;updateDots();if(pinEntry.length===4)setTimeout(handlePinComplete,150)};
+  $('#pin-pad').onclick=e=>{const k=e.target.dataset.key;if(!k)return;if(k==='清'){pinEntry='';updateDots();return}if(k==='⌫'){pinEntry=pinEntry.slice(0,-1);updateDots();return}if(pinEntry.length>=4)return;pinEntry+=k;updateDots();if(pinEntry.length===4)setTimeout(handlePinComplete,150)};
+  $('#pin-cancel-btn').onclick=cancelPin;
 }
-function updateDots(){const ds=$$('#pin-dots .pin-dot');ds.forEach((d,i)=>d.classList.toggle('filled',i<pinEntry.length));ds.forEach(d=>d.classList.remove('shake'))}
-function showPinScreen(mode){pinMode=mode;pinEntry='';updateDots();$('#pin-screen').classList.remove('hidden');$('#pin-dots').classList.remove('shake');if(mode==='enter'){$('#pin-title').textContent='输入密码';$('#pin-subtitle').textContent=''}else if(mode==='setup'){$('#pin-title').textContent='设置密码';$('#pin-subtitle').textContent='输入 4 位数字密码'}else{$('#pin-title').textContent='确认密码';$('#pin-subtitle').textContent='再次输入以确认'}}
+function updateDots(){$$('#pin-dots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinEntry.length));$$('#pin-dots .pin-dot').forEach(d=>d.classList.remove('shake'))}
+function showPinScreen(mode){pinMode=mode;pinEntry='';updateDots();$('#pin-screen').classList.remove('hidden');$('#pin-dots').classList.remove('shake');$('#pin-cancel-area').style.display=mode==='enter'?'none':'flex';if(mode==='enter'){$('#pin-title').textContent='输入密码';$('#pin-subtitle').textContent=''}else if(mode==='setup'){$('#pin-title').textContent='设置密码';$('#pin-subtitle').textContent='输入 4 位数字密码'}else{$('#pin-title').textContent='确认密码';$('#pin-subtitle').textContent='再次输入以确认'}}
 function hidePinScreen(){$('#pin-screen').classList.add('hidden')}
+function cancelPin(){if(pinMode==='setup'||pinMode==='confirm'){pinEntry='';pinFirst='';hidePinScreen();toast('已取消')}}
 function handlePinComplete(){
-  if(pinMode==='enter'){if(pinEntry===data.settings.pin){unlocked=true;sessionStorage.setItem('ps_unlocked','1');hidePinScreen();toast('欢迎回来')}else{shakeDots();pinEntry=''}}
+  if(pinMode==='enter'){if(pinEntry===data.settings.pin){unlocked=true;sessionStorage.setItem('ps_u','1');hidePinScreen();toast('欢迎回来')}else{shakeDots();pinEntry=''}}
   else if(pinMode==='setup'){pinFirst=pinEntry;pinEntry='';showPinScreen('confirm')}
-  else{if(pinEntry===pinFirst){data.settings.pin=pinEntry;unlocked=true;sessionStorage.setItem('ps_unlocked','1');save();hidePinScreen();render();toast('密码已设置')}else{shakeDots();pinEntry='';pinFirst='';showPinScreen('setup');$('#pin-subtitle').textContent='两次输入不一致，请重新设置'}}
+  else{if(pinEntry===pinFirst){data.settings.pin=pinEntry;unlocked=true;sessionStorage.setItem('ps_u','1');save();hidePinScreen();render();toast('密码已设置')}else{shakeDots();pinEntry='';pinFirst='';showPinScreen('setup');$('#pin-subtitle').textContent='不匹配，重新设置'}}
   updateDots();
 }
 function shakeDots(){$('#pin-dots').classList.add('shake');setTimeout(()=>$('#pin-dots').classList.remove('shake'),400)}
 
-// ── Navigation ────────────────────
+// ═══ Navigation ══════════════════
 function switchTab(tab){currentTab=tab;detailPersonId=null;if(tab==='record'&&data.people.length===1)selectedPersonId=data.people[0].id;if(tab!=='record')selectedPersonId=null;currentScore=null;searchQuery='';timeFilter='全部';groupFilter='全部';render()}
 function showDetail(id){detailPersonId=id;searchQuery='';timeFilter='全部';render()}
-function goBack(){detailPersonId=null;currentTab='people';searchQuery='';render()}
+function goBack(){detailPersonId=null;currentTab='people';render()}
 
-// ── Data ops ──────────────────────
+// ═══ Data CRUD ══════════════════
 function addPerson(name){name=name.trim();if(!name){toast('请输入姓名');return}if(data.people.some(p=>p.name===name)){toast('该名字已存在');return}data.people.push({id:uid(),name,note:'',group:'其他',createdAt:new Date().toISOString()});if(data.people.length===1)selectedPersonId=data.people[0].id;save();render();toast('已添加 '+name)}
-async function deletePerson(id){const p=getPerson(id);if(!p)return;const ok=await confirmDialog('确定要删除「'+esc(p.name)+'」及其所有记录吗？');if(!ok)return;data.people=data.people.filter(x=>x.id!==id);data.events=data.events.filter(e=>e.personId!==id);if(selectedPersonId===id)selectedPersonId=data.people.length>0?data.people[0].id:null;if(detailPersonId===id)goBack();save();render();toast('已删除 '+esc(p.name))}
+async function deletePerson(id){const p=getPerson(id);if(!p)return;const ok=await confirmDialog('删除「'+esc(p.name)+'」及所有记录？');if(!ok)return;data.people=data.people.filter(x=>x.id!==id);data.events=data.events.filter(e=>e.personId!==id);if(selectedPersonId===id)selectedPersonId=data.people.length>0?data.people[0].id:null;if(detailPersonId===id)goBack();save();render();toast('已删除 '+esc(p.name))}
 
 function addEvent(pid,score,note,cat,dateStr){
   const ev={id:uid(),personId:pid,score,note:note||'（无备注）',category:cat||'其他',createdAt:(dateStr||todayStr())+'T'+new Date().toTimeString().slice(0,8)};
-  data.events.push(ev);lastEventId=ev.id;save();return ev;
+  data.events.push(ev);undoStack.push(ev.id);if(undoStack.length>MAX_UNDO)undoStack.shift();save();return ev;
 }
-function undoLastEvent(){if(!lastEventId)return;const i=data.events.findIndex(e=>e.id===lastEventId);if(i===-1)return;const ev=data.events[i];data.events.splice(i,1);lastEventId=null;save();if(detailPersonId===ev.personId)render();else if(currentTab==='people')renderPeopleTab()}
+function undoLastEvent(){
+  if(undoStack.length===0)return;const eid=undoStack.pop();const i=data.events.findIndex(e=>e.id===eid);if(i===-1)return;
+  const ev=data.events[i];data.events.splice(i,1);save();
+  if(detailPersonId===ev.personId)render();else if(currentTab==='people')renderPeopleTab();
+}
 function handleSaveEvent(){
   if(!selectedPersonId||currentScore===null||currentScore===0)return;
-  const ev=addEvent(selectedPersonId,currentScore,$('#note-input').value.trim(),currentCategory,$('#event-date').value||todayStr());
-  $('#note-input').value='';currentScore=null;currentCategory='其他';$('#custom-score').value='';$('#event-date').value=todayStr();
+  const dateStr=$('#event-date').value||todayStr();
+  const ev=addEvent(selectedPersonId,currentScore,$('#note-input').value.trim(),currentCategory,dateStr);
+  $('#note-input').value='';currentScore=null;currentCategory='其他';$('#custom-score').value='';
   haptic();render();toast('已记录 '+scoreText(ev.score),undoLastEvent);
 }
 function quickScore(pid,score){
-  const v=data.settings.quickScore||5;
-  const ev=addEvent(pid,score,'快捷'+scoreText(score),'其他',todayStr());
+  const qs=data.settings.quickScore||5;const ev=addEvent(pid,score,'快捷'+scoreText(score),'其他',todayStr());
   haptic();if(detailPersonId===pid)render();else renderPeopleTab();toast(scoreText(score)+' '+esc(getPerson(pid).name),undoLastEvent);
 }
-async function deleteEvent(eid){const ok=await confirmDialog('确定要删除这条记录吗？');if(!ok)return;data.events=data.events.filter(e=>e.id!==eid);save();render();toast('已删除')}
+async function deleteEvent(eid){const ok=await confirmDialog('删除这条记录？');if(!ok)return;data.events=data.events.filter(e=>e.id!==eid);undoStack=undoStack.filter(id=>id!==eid);save();render();toast('已删除')}
+async function removeCategory(cat){if(cat==='其他'){toast('默认分类不可删除');return}const ok=await confirmDialog('删除分类「'+cat+'」？已有事件会归为「其他」');if(!ok)return;const cats=data.settings.categories;const i=cats.indexOf(cat);if(i>-1)cats.splice(i,1);data.events.forEach(e=>{if(e.category===cat)e.category='其他'});if(currentCategory===cat)currentCategory='其他';save();toast('已删除「'+cat+'」');render()}
 
 function selectPerson(id){selectedPersonId=id;renderRecordForm()}
 function setScore(val){currentScore=val;$('#custom-score').value=val;renderScorePresets();updateSaveBtn()}
 function setCustomScore(val){const n=parseInt(val);currentScore=isNaN(n)?null:n;renderScorePresets();updateSaveBtn()}
 function updateSaveBtn(){$('#save-btn').disabled=!(selectedPersonId&&currentScore!==null&&currentScore!==0)}
 
-// ── Person note ───────────────────
-function renderPersonNote(p){const a=$('#person-note-area');a.innerHTML=p.note?`<div class="person-note-text" id="person-note-display">📌 ${esc(p.note)}</div>`:`<div class="person-note-text placeholder" id="person-note-display">📌 点击添加备注...</div>`;$('#person-note-display').onclick=()=>startEditNote(p)}
-function startEditNote(p){const a=$('#person-note-area');a.innerHTML=`<textarea class="person-note-edit" id="person-note-input" rows="2" placeholder="备注（如：大学室友、2024年认识...）" maxlength="200">${esc(p.note)}</textarea>`;const inp=$('#person-note-input');inp.focus();inp.onblur=()=>{p.note=inp.value.trim();save();renderPersonNote(p)};inp.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.blur()}}}
+// ═══ Person Note ═════════════════
+function renderPersonNote(p){const a=$('#person-note-area');a.innerHTML=p.note?`<div class="person-note-text" id="pn-disp">📌 ${esc(p.note)}</div>`:`<div class="person-note-text placeholder" id="pn-disp">📌 点击添加备注...</div>`;$('#pn-disp').onclick=()=>startEditNote(p)}
+function startEditNote(p){$('#person-note-area').innerHTML=`<textarea class="person-note-edit" id="pn-input" rows="2" placeholder="备注..." maxlength="200">${esc(p.note)}</textarea>`;const inp=$('#pn-input');inp.focus();const save=()=>{p.note=inp.value.trim();save();renderPersonNote(p)};inp.onblur=save;inp.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.blur()}}}
 
-// ── Swipe handling ────────────────
+// ═══ Swipe ══════════════════════
 function attachSwipe(card,eid){
-  let startX=0,curX=0,swiped=false;
-  card.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;curX=startX;swiped=false},{passive:true});
-  card.addEventListener('touchmove',e=>{curX=e.touches[0].clientX;const dx=curX-startX;if(dx<-10){card.style.transform=`translateX(${dx}px)`;swiped=Math.abs(dx)>40}},{passive:true});
-  card.addEventListener('touchend',()=>{if(Math.abs(curX-startX)>80&&curX<startX){card.style.transform='translateX(0)';deleteEvent(eid)}else{card.style.transform='translateX(0)';if(!swiped){editEvent(eid)}}});
-  card.addEventListener('click',e=>{if(Math.abs(curX-startX)>10)return;editEvent(eid)});
+  let sx=0,cx=0;
+  card.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;cx=sx;card.style.transition='none'},{passive:true});
+  card.addEventListener('touchmove',e=>{cx=e.touches[0].clientX;const dx=cx-sx;if(dx<-5){const d=Math.max(dx,-80);card.style.transform=`translateX(${d}px)`;card.closest('.event-card-wrap').classList.toggle('swiping',Math.abs(d)>30)}},{passive:true});
+  card.addEventListener('touchend',()=>{card.style.transition='transform 0.2s ease';const dx=cx-sx;if(dx<-70){card.style.transform='translateX(0)';card.closest('.event-card-wrap').classList.remove('swiping');haptic();deleteEvent(eid)}else{card.style.transform='translateX(0)';card.closest('.event-card-wrap').classList.remove('swiping');if(Math.abs(dx)<8)editEvent(eid)}});
 }
 
-// ── Edit modal ────────────────────
+// ═══ Edit Modal ═════════════════
 function showEditModal(event){
   return new Promise(resolve=>{
     const presets=[-20,-10,-5,-3,-1,1,3,5,10,20],cats=getCats();
     let es=event.score,en=event.note==='快捷加分'||event.note==='快捷减分'||event.note==='（无备注）'?'':event.note;
     let ec=event.category||'其他',ed=fmtDateFull(event.createdAt);
     const ov=document.createElement('div');ov.className='modal-overlay';
-    function rm(){ov.innerHTML=`<div class="modal-box"><div style="font-size:17px;font-weight:700;margin-bottom:12px;">编辑记录</div><div class="edit-label">评分</div><div class="edit-score-row">${presets.map(v=>`<button class="edit-score-btn ${v>0?'pos':'neg'}${es===v?' selected':''}" data-sv="${v}">${scoreText(v)}</button>`).join('')}</div><div style="text-align:center;margin-bottom:8px;"><input type="number" class="custom-score-input" style="width:80px;" value="${es}" placeholder="自定义"></div><div class="edit-label">分类</div><div class="cat-chips" style="justify-content:center;margin-bottom:8px;">${cats.map(c=>`<span class="cat-chip${ec===c?' selected':''}" data-cat="${c}">${c}</span>`).join('')}</div><div class="edit-label">日期</div><input type="date" class="date-input" value="${ed}" style="margin-bottom:8px;"><div class="edit-label">备注</div><textarea class="note-textarea edit-note" style="min-height:52px;">${esc(en)}</textarea><div class="modal-actions" style="margin-top:14px;"><button class="modal-cancel">取消</button><button class="modal-primary">保存</button></div></div>`;document.body.appendChild(ov);
-    ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();resolve(null)};ov.querySelector('.modal-primary').onclick=()=>{ov.remove();resolve({score:es,note:en,category:ec,date:ed})};ov.onclick=(e)=>{if(e.target===ov){ov.remove();resolve(null)}};
-    ov.querySelectorAll('.edit-score-btn').forEach(b=>{b.onclick=()=>{es=parseInt(b.dataset.sv);rmi(ov)}});
-    const ci=ov.querySelector('.custom-score-input');ci.oninput=function(){const v=parseInt(this.value);if(!isNaN(v))es=v;rmi(ov)};ci.onkeydown=function(e){if(e.key==='Enter')e.preventDefault()};
-    ov.querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{ec=ch.dataset.cat;rmi(ov)}});
-    ov.querySelector('.edit-note').oninput=function(){en=this.value};ov.querySelector('.date-input').onchange=function(){ed=this.value};
-    }
+    function rm(){ov.innerHTML=`<div class="modal-box"><div style="font-size:18px;font-weight:700;margin-bottom:14px;">编辑记录</div><div class="edit-label">评分</div><div class="edit-score-row">${presets.map(v=>`<button class="edit-score-btn ${v>0?'pos':'neg'}${es===v?' selected':''}" data-sv="${v}">${scoreText(v)}</button>`).join('')}</div><div style="text-align:center;margin-bottom:10px;"><input type="number" class="custom-score-input" style="width:80px;" value="${es}" placeholder="自定义"></div><div class="edit-label">分类</div><div class="cat-chips" style="justify-content:center;margin-bottom:10px;">${cats.map(c=>`<span class="cat-chip${ec===c?' selected':''}" data-cat="${c}">${c}</span>`).join('')}</div><div class="edit-label">日期</div><input type="date" class="date-input" value="${ed}" style="margin-bottom:10px;"><div class="edit-label">备注</div><textarea class="note-textarea edit-note" style="min-height:52px;margin-bottom:4px;">${esc(en)}</textarea><div class="modal-actions" style="margin-top:16px;"><button class="modal-cancel">取消</button><button class="modal-primary">保存</button></div></div>`;document.body.appendChild(ov);
+    ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();resolve(null)};ov.querySelector('.modal-primary').onclick=()=>{ov.remove();resolve({score:es,note:en,category:ec,date:ed})};ov.onclick=e=>{if(e.target===ov){ov.remove();resolve(null)}};
+    ov.querySelectorAll('.edit-score-btn').forEach(b=>{b.onclick=()=>{es=parseInt(b.dataset.sv);rmi(ov)}});const ci=ov.querySelector('.custom-score-input');ci.oninput=function(){const v=parseInt(this.value);if(!isNaN(v))es=v;rmi(ov)};ci.onkeydown=function(e){if(e.key==='Enter')e.preventDefault()};ov.querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{ec=ch.dataset.cat;rmi(ov)}});ov.querySelector('.edit-note').oninput=function(){en=this.value};ov.querySelector('.date-input').onchange=function(){ed=this.value};}
     function rmi(ov){ov.querySelectorAll('.edit-score-btn').forEach(b=>b.classList.toggle('selected',parseInt(b.dataset.sv)===es));const ci=ov.querySelector('.custom-score-input');if(ci!==document.activeElement)ci.value=es;ov.querySelectorAll('.cat-chip').forEach(ch=>ch.classList.toggle('selected',ch.dataset.cat===ec))}
     rm();
   })
 }
 async function editEvent(eid){const ev=data.events.find(e=>e.id===eid);if(!ev)return;const r=await showEditModal(ev);if(!r)return;ev.score=r.score;ev.note=r.note||'（无备注）';ev.category=r.category;if(r.date)ev.createdAt=r.date+'T'+new Date(ev.createdAt).toTimeString().slice(0,8);save();render();toast('已更新')}
 
-// ── Sparkline ─────────────────────
-function renderSparkline(pid){
-  const evts=data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).slice(-12);
-  if(evts.length<2)return'';
-  let cum=0;const pts=evts.map(e=>{cum+=e.score;return cum});
-  const mn=Math.min(0,...pts),mx=Math.max(0,...pts),rng=mx-mn||1,W=55,H=22;
-  const path=pts.map((v,i)=>{const x=(i/(pts.length-1))*W,y=H-((v-mn)/rng)*H;return`${i===0?'M':'L'}${x.toFixed(1)},${y.toFixed(1)}`}).join(' ');
-  const clr=cum>=0?'var(--positive)':'var(--negative)';
-  return`<svg class="sparkline" width="${W}" height="${H}"><path d="${path}" fill="none" stroke="${clr}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// ═══ Sparkline ══════════════════
+function sparkline(pid){
+  const evts=data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).slice(-10);
+  if(evts.length<2)return'';let cum=0;const pts=evts.map(e=>{cum+=e.score;return cum});
+  const mn=Math.min(0,...pts),mx=Math.max(0,...pts),rng=mx-mn||1,W=50,H=20;
+  const d=pts.map((v,i)=>`${i===0?'M':'L'}${((i/(pts.length-1))*W).toFixed(1)},${(H-((v-mn)/rng)*H).toFixed(1)}`).join(' ');
+  return`<svg class="sparkline" width="${W}" height="${H}"><path d="${d}" fill="none" stroke="${cum>=0?'var(--positive)':'var(--negative)'}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
-// ── Trend chart ───────────────────
-function renderTrendChart(pid){
+// ═══ Trend Chart ════════════════
+function trendChart(pid){
   const evts=data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
-  if(evts.length<2)return'';
-  let cum=0;const pts=evts.map(e=>{cum+=e.score;return{cum,score:e.score,date:e.createdAt}});
+  if(evts.length<2)return'';let cum=0;const pts=evts.map(e=>{cum+=e.score;return{cum,score:e.score,date:e.createdAt}});
   const cv=pts.map(p=>p.cum),minC=Math.min(0,...cv),maxC=Math.max(0,...cv),range=maxC-minC||1;
-  const W=340,H=170,pad={t:18,r:12,b:28,l:44},pW=W-pad.l-pad.r,pH=H-pad.t-pad.b,n=pts.length;
-  pts.forEach((p,i)=>{p.x=pad.l+(i/Math.max(n-1,1))*pW;p.y=pad.t+((maxC-p.cum)/range)*pH});
+  const W=340,H=170,px=44,py=18,pr=12,pb=28,pW=W-px-pr,pH=H-py-pb,n=pts.length;
+  pts.forEach((p,i)=>{p.x=px+(i/Math.max(n-1,1))*pW;p.y=py+((maxC-p.cum)/range)*pH});
   const step=range<=10?5:range<=50?10:range<=100?20:range<=200?50:100;
   const gs=Math.floor(minC/step)*step,ge=Math.ceil(maxC/step)*step;
-  let gl='',yl='';
-  for(let v=gs;v<=ge;v+=step){const y=pad.t+((maxC-v)/range)*pH;gl+=`<line class="grid-line" x1="${pad.l}" y1="${y.toFixed(1)}" x2="${pad.l+pW}" y2="${y.toFixed(1)}"/>`;yl+=`<text x="${pad.l-6}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--secondary)">${v>=0?'+'+v:v}</text>`}
-  let xl='';const li=n<=4?[0,n-1]:[0,Math.floor(n/3),Math.floor(2*n/3),n-1];li.forEach(i=>{xl+=`<text x="${pts[i].x.toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--secondary)">${fmtDate(pts[i].date)}</text>`});
-  const pd=pts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  const lc=cv[n-1]>=0?'var(--positive)':'var(--negative)';
-  const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" class="trend-dot" fill="${p.score>=0?'var(--positive)':'var(--negative)'}"/>`).join('');
-  return`<div class="chart-wrap"><svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;">${gl}${yl}<line class="axis-line" x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t+pH}"/><line class="axis-line" x1="${pad.l}" y1="${pad.t+pH}" x2="${pad.l+pW}" y2="${pad.t+pH}"/><path class="trend-line" d="${pd}" stroke="${lc}"/>${dots}${xl}</svg></div>`;
+  let gl='',yl='';for(let v=gs;v<=ge;v+=step){const y=py+((maxC-v)/range)*pH;gl+=`<line class="grid-line" x1="${px}" y1="${y.toFixed(1)}" x2="${px+pW}" y2="${y.toFixed(1)}"/>`;yl+=`<text x="${px-6}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--text2)">${v>=0?'+'+v:v}</text>`}
+  let xl='';const li=n<=4?[0,n-1]:[0,Math.floor(n/3),Math.floor(2*n/3),n-1];li.forEach(i=>{xl+=`<text x="${pts[i].x.toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--text2)">${fmtDate(pts[i].date)}</text>`});
+  const pd=pts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '),lc=cv[n-1]>=0?'var(--positive)':'var(--negative)';
+  // Sample dots for readability
+  let dots='';if(evts.length<=MAX_CHART_DOTS){dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="${p.score>=0?'var(--positive)':'var(--negative)'}" stroke="var(--card)" stroke-width="2"/>`).join('')}else{const gap=Math.floor(evts.length/(MAX_CHART_DOTS-1));for(let i=0;i<evts.length;i+=gap){const p=pts[i];dots+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${p.score>=0?'var(--positive)':'var(--negative)'}" stroke="var(--card)" stroke-width="1.5"/>`}const lp=pts[evts.length-1];dots+=`<circle cx="${lp.x.toFixed(1)}" cy="${lp.y.toFixed(1)}" r="4" fill="${lp.score>=0?'var(--positive)':'var(--negative)'}" stroke="var(--card)" stroke-width="2"/>`}
+  return`<div class="chart-wrap"><svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;">${gl}${yl}<line class="axis-line" x1="${px}" y1="${py}" x2="${px}" y2="${py+pH}"/><line class="axis-line" x1="${px}" y1="${py+pH}" x2="${px+pW}" y2="${py+pH}"/><path d="${pd}" fill="none" stroke="${lc}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}${xl}</svg></div>`;
 }
 
-// ── Cat stats ─────────────────────
-function renderCatStats(pid){const evts=data.events.filter(e=>e.personId===pid);if(evts.length===0)return'';const map={};evts.forEach(e=>{const c=e.category||'其他';map[c]=(map[c]||0)+e.score});return Object.entries(map).sort((a,b)=>b[1]-a[1]).map(([c,sc])=>`<span class="cat-stat-chip ${sc>=0?'pos':'neg'}">${c} ${scoreText(sc)}</span>`).join('')}
+// ═══ Cat Stats ══════════════════
+function catStats(pid){const evts=data.events.filter(e=>e.personId===pid);if(evts.length===0)return'';const m={};evts.forEach(e=>{const c=e.category||'其他';m[c]=(m[c]||0)+e.score});return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([c,s])=>`<span class="cat-stat-chip ${s>=0?'pos':'neg'}">${c} ${scoreText(s)}</span>`).join('')}
 
-// ── Render ────────────────────────
-function render(){renderTabBar();if(detailPersonId){renderDetailScreen();showScreen('detail')}else{showScreen(currentTab);if(currentTab==='record')renderRecordForm();if(currentTab==='people')renderPeopleTab();if(currentTab==='insights')renderInsightsTab();if(currentTab==='settings')renderSettingsTab()}updatePinButton()}
+// ═══ Render ═════════════════════
+function render(){renderTabBar();if(detailPersonId){renderDetail();showScreen('detail')}else{showScreen(currentTab);if(currentTab==='record')renderRecord();if(currentTab==='people')renderPeople();if(currentTab==='insights')renderInsights();if(currentTab==='settings')renderSettings()}updatePinBtn()}
 function showScreen(name){$$('.screen').forEach(s=>s.classList.remove('active'));const sc=$('#screen-'+name);if(sc)sc.classList.add('active');$('#tab-bar').style.display=(name==='detail')?'none':'flex';$('main').style.paddingBottom=(name==='detail')?'20px':'90px'}
 function renderTabBar(){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===currentTab))}
-function updatePinButton(){$('#pin-setup-btn').style.display=data.settings.pin?'none':'block';$('#pin-remove-btn').style.display=data.settings.pin?'block':'none'}
+function updatePinBtn(){$('#pin-setup-btn').style.display=data.settings.pin?'none':'block';$('#pin-remove-btn').style.display=data.settings.pin?'block':'none'}
 
-// ── Record form ───────────────────
-function renderRecordForm(){
+// ═══ Record ═════════════════════
+function renderRecord(){
   if(!$('#event-date').value)$('#event-date').value=todayStr();
   const ct=$('#person-list'),cats=getCats();
-  if(data.people.length===0){ct.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">还没有添加任何人<br>请先在「设置」中添加</div><button class="btn-secondary" onclick="window._goSettings()">去添加</button></div>`;$('#cat-chips').innerHTML='';$('#tmpl-chips').innerHTML=''}else{
+  if(data.people.length===0){ct.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">还没有添加任何人<br>请先在「设置」中添加</div><button class="btn-secondary" onclick="window._goSettings()" style="margin-top:10px;">去添加</button></div>`;$('#cat-chips').innerHTML='';$('#tmpl-chips').innerHTML=''}else{
     ct.innerHTML=data.people.map(p=>{const sc=getScore(p.id);return`<div class="person-select-item${selectedPersonId===p.id?' selected':''}" data-pid="${p.id}"><div class="avatar-sm">${p.name[0]}</div><span class="item-name">${esc(p.name)}</span><span class="item-score ${scoreClass(sc)}">${scoreText(sc)}</span></div>`}).join('');
     ct.querySelectorAll('.person-select-item').forEach(el=>{el.onclick=()=>selectPerson(el.dataset.pid)});
     $('#cat-chips').innerHTML=cats.map(c=>`<span class="cat-chip${currentCategory===c?' selected':''}" data-cat="${c}">${c}</span>`).join('');
-    $('#cat-chips').querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{currentCategory=ch.dataset.cat;renderRecordForm()}});
-    // Templates
-    const tmpls=data.settings.noteTemplates||[];
-    if(tmpls.length>0)$('#tmpl-chips').innerHTML=tmpls.map(t=>`<span class="tmpl-chip" data-t="${esc(t)}">${esc(t)}</span>`).join('');
-    else $('#tmpl-chips').innerHTML='';
+    $('#cat-chips').querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{currentCategory=ch.dataset.cat;renderRecord()}});
+    const tmpls=data.settings.noteTemplates||[];if(tmpls.length>0)$('#tmpl-chips').innerHTML=tmpls.map(t=>`<span class="tmpl-chip" data-t="${esc(t)}">${esc(t)}</span>`).join('');else $('#tmpl-chips').innerHTML='';
     $('#tmpl-chips').querySelectorAll('.tmpl-chip').forEach(ch=>{ch.onclick=()=>{$('#note-input').value=ch.dataset.t;$('#note-input').focus()}});
   }
   renderScorePresets();updateSaveBtn();
@@ -504,147 +523,134 @@ function renderScorePresets(){
   $$('.preset-btn').forEach(b=>{b.onclick=()=>setScore(parseInt(b.dataset.score))});if(currentScore!==null)$('#custom-score').value=currentScore;
 }
 
-// ── People tab ────────────────────
-function renderPeopleTab(){
-  const ppl=data.people;
-  if(ppl.length===0){$('#people-list').innerHTML=`<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">还没有添加任何人<br>去「设置」添加你的第一个人物吧</div></div>`;$('#group-filter').innerHTML='';return}
-  // Group filter
-  const groups=['全部',...new Set(ppl.map(p=>p.group||'其他').filter(Boolean))];
-  $('#group-filter').innerHTML=groups.map(g=>`<span class="group-chip${groupFilter===g?' active':''}" data-g="${g}">${g}</span>`).join('');
-  $('#group-filter').querySelectorAll('.group-chip').forEach(ch=>{ch.onclick=()=>{groupFilter=ch.dataset.g;renderPeopleTab()}});
-  // Filter & sort
-  let filtered=groupFilter==='全部'?[...ppl]:ppl.filter(p=>(p.group||'其他')===groupFilter);
-  filtered.sort((a,b)=>getScore(b.id)-getScore(a.id));
-  const qs=data.settings.quickScore||5;
+// ═══ People ═════════════════════
+function renderPeople(){
+  const ppl=data.people;if(ppl.length===0){$('#people-list').innerHTML=`<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">还没有添加任何人</div></div>`;$('#group-filter').innerHTML='';return}
+  const gs=getGroups();$('#group-filter').innerHTML=gs.map(g=>`<span class="filter-chip${groupFilter===g?' active':''}" data-g="${g}">${g}</span>`).join('');
+  $('#group-filter').querySelectorAll('.filter-chip').forEach(ch=>{ch.onclick=()=>{groupFilter=ch.dataset.g;renderPeople()}});
+  let filtered=groupFilter==='全部'?[...ppl]:ppl.filter(p=>(p.group||'其他')===groupFilter);filtered.sort((a,b)=>getScore(b.id)-getScore(a.id));
+  const qs=data.settings.quickScore||5,qv=qs===1?'±1':qs===3?'±3':qs===10?'±10':'±5';
   $('#people-list').innerHTML=filtered.map(p=>{
-    const sc=getScore(p.id),scls=scoreClass(sc),last=getLastEvent(p.id);
+    const sc=getScore(p.id),scls=scoreClass(sc),last=getLastEvent(p.id),grp=p.group||'其他';
     return`<div class="card person-card" data-pid="${p.id}">
-      <div class="avatar">${p.name[0]}</div>
-      <div class="person-info"><div class="person-name">${esc(p.name)}${p.group&&p.group!=='其他'?' <span style="font-size:10px;color:var(--secondary);">#'+esc(p.group)+'</span>':''}</div><div class="person-last-event">${esc(last?last.note:'暂无记录')}</div></div>
-      ${renderSparkline(p.id)}
-      <div class="person-score-wrap"><span class="person-score ${scls}">${scoreText(sc)}</span></div>
-      <div class="quick-btns"><button class="quick-btn plus" data-pid="${p.id}" data-q="1">+</button><button class="quick-btn minus" data-pid="${p.id}" data-q="-1">−</button></div>
-    </div>`;
-  }).join('');
+      <div class="avatar">${p.name[0]}</div><div class="person-info"><div class="person-name">${esc(p.name)}${grp!=='其他'?`<span class="person-group-tag">#${esc(grp)}</span>`:''}</div><div class="person-last-event">${esc(last?last.note:'暂无记录')}</div></div>
+      ${sparkline(p.id)}<div class="person-score-wrap"><span class="person-score ${scls}">${scoreText(sc)}</span></div>
+      <div class="quick-btns"><button class="quick-btn plus" data-pid="${p.id}" data-q="1">${scoreText(qs)}</button><button class="quick-btn minus" data-pid="${p.id}" data-q="-1">${qs>0?'-'+qs:qs}</button></div>
+    </div>`}).join('');
   $('#people-list').querySelectorAll('.person-card').forEach(el=>{el.onclick=(e)=>{if(e.target.closest('.quick-btn'))return;showDetail(el.dataset.pid)}});
   $('#people-list').querySelectorAll('.quick-btn').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();quickScore(b.dataset.pid,parseInt(b.dataset.q)*qs)}});
 }
 
-// ── Detail screen ─────────────────
-function renderDetailScreen(){
-  const p=getPerson(detailPersonId);if(!p){goBack();return}
-  const sc=getScore(detailPersonId);$('.detail-person-name').textContent=p.name;$('.detail-total-score').textContent=scoreText(sc);$('.detail-total-score').className='detail-total-score '+scoreClass(sc);
-  renderPersonNote(p);$('#detail-chart').innerHTML=renderTrendChart(detailPersonId);$('#detail-cat-stats').innerHTML=renderCatStats(detailPersonId);
-  // Time filter
-  $('#time-filter').innerHTML=['全部','本周','本月','三月'].map(t=>`<span class="time-chip${timeFilter===t?' active':''}" data-t="${t}">${t}</span>`).join('');
-  $('#time-filter').querySelectorAll('.time-chip').forEach(ch=>{ch.onclick=()=>{timeFilter=ch.dataset.t;renderDetailScreen()}});
-  // Build event list with time filter
+// ═══ Detail ═════════════════════
+function renderDetail(){
+  const p=getPerson(detailPersonId);if(!p){goBack();return}const sc=getScore(detailPersonId);
+  $('.detail-person-name').textContent=p.name;$('.detail-total-score').textContent=scoreText(sc);$('.detail-total-score').className='detail-total-score '+scoreClass(sc);
+  renderPersonNote(p);$('#detail-chart').innerHTML=trendChart(detailPersonId);$('#detail-cat-stats').innerHTML=catStats(detailPersonId);
+  $('#time-filter').innerHTML=['全部','本周','本月','三月'].map(t=>`<span class="filter-chip${timeFilter===t?' active':''}" data-t="${t}">${t}</span>`).join('');
+  $('#time-filter').querySelectorAll('.filter-chip').forEach(ch=>{ch.onclick=()=>{timeFilter=ch.dataset.t;renderDetail()}});
   let events=getEvents(detailPersonId);
-  if(timeFilter!=='全部'){const cutoff=timeFilter==='本周'?weekAgo():timeFilter==='本月'?monthAgo():threeMonthAgo();events=events.filter(e=>new Date(e.createdAt)>=new Date(cutoff))}
-  const q=searchQuery.toLowerCase().trim();const filtered=q?events.filter(e=>e.note.toLowerCase().includes(q)||(e.category||'其他').includes(q)):events;
+  if(timeFilter!=='全部'){const cutoff=timeFilter==='本周'?weekStart():timeFilter==='本月'?monthStart():monthsAgo(3);events=events.filter(e=>new Date(e.createdAt)>=cutoff)}
+  const q=searchQuery.toLowerCase().trim(),filtered=q?events.filter(e=>e.note.toLowerCase().includes(q)||(e.category||'其他').includes(q)):events;
   if(q&&filtered.length!==events.length){$('#search-count').textContent=`找到 ${filtered.length} 条（共 ${events.length} 条）`;$('#search-count').classList.add('show')}else{$('#search-count').classList.remove('show')}
   const ct=$('#events-list');
-  if(filtered.length===0){ct.innerHTML=q?`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">没有匹配的记录</div></div>`:`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">还没有任何记录</div></div>`}else{
-    ct.innerHTML=filtered.map(e=>`
-      <div class="event-card-wrap"><div class="delete-bg">删除</div>
-      <div class="event-card" data-eid="${e.id}">
-        <div class="event-score ${scoreClass(e.score)}">${scoreText(e.score)}</div>
-        <div class="event-body"><div class="event-note">${esc(e.note)}</div><div class="event-meta"><span class="event-cat-badge">${esc(e.category||'其他')}</span><span class="event-date">${fmtDate(e.createdAt)}</span></div></div>
-        <button class="event-del-btn" data-eid="${e.id}">✕</button>
-      </div></div>`).join('');
-    ct.querySelectorAll('.event-card').forEach(c=>{attachSwipe(c,c.dataset.eid)});
-    ct.querySelectorAll('.event-del-btn').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();deleteEvent(b.dataset.eid)}});
+  if(filtered.length===0){ct.innerHTML=q?`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">没有匹配的记录</div></div>`:`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">还没有任何记录<br>去「记录」页面添加吧</div></div>`}else{
+    ct.innerHTML=filtered.map(e=>`<div class="event-card-wrap"><div class="delete-bg">删除</div><div class="event-card" data-eid="${e.id}"><div class="event-score ${scoreClass(e.score)}">${scoreText(e.score)}</div><div class="event-body"><div class="event-note">${esc(e.note)}</div><div class="event-meta"><span class="event-cat-badge">${esc(e.category||'其他')}</span><span class="event-date">${fmtDate(e.createdAt)}</span></div></div><button class="event-del-btn" data-eid="${e.id}">✕</button></div></div>`).join('');
+    ct.querySelectorAll('.event-card').forEach(c=>{attachSwipe(c,c.dataset.eid)});ct.querySelectorAll('.event-del-btn').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();deleteEvent(b.dataset.eid)}});
   }
 }
 
-// ── Insights tab ──────────────────
-function renderInsightsTab(){
-  const now=new Date(),ws=weekAgo(),ms=monthAgo();
-  const wkEvts=data.events.filter(e=>new Date(e.createdAt)>=new Date(ws));
-  const moEvts=data.events.filter(e=>new Date(e.createdAt)>=new Date(ms));
+// ═══ Insights ═══════════════════
+function renderInsights(){
+  const now=new Date(),ws=weekStart(),ms=monthStart();
+  const wkEvts=data.events.filter(e=>new Date(e.createdAt)>=ws),moEvts=data.events.filter(e=>new Date(e.createdAt)>=ms);
   function sumByPerson(evts){const m={};evts.forEach(e=>{m[e.personId]=(m[e.personId]||0)+e.score});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
-  function renderBlock(evts,label){
-    const byP=sumByPerson(evts),top=byP.slice(0,3),total=evts.reduce((s,e)=>s+e.score,0);
-    let h=`<div class="summary-title">${label}</div>`;
-    if(evts.length===0)h+=`<div class="summary-empty">暂无记录</div>`;
-    else{
-      h+=`<div class="summary-row"><span class="label">记录总数</span><span>${evts.length} 条</span></div>`;
-      h+=`<div class="summary-row"><span class="label">总分变化</span><span style="font-weight:700;color:${total>=0?'var(--positive)':'var(--negative)'}">${scoreText(total)}</span></div>`;
-      top.forEach(([pid,sc],i)=>{const p=getPerson(pid);if(!p)return;h+=`<div class="summary-row"><span class="label">${i===0?'🥇':i===1?'🥈':'🥉'} ${esc(p.name)}</span><span style="font-weight:600;color:${sc>=0?'var(--positive)':'var(--negative)'}">${scoreText(sc)}</span></div>`});
-    }
-    return h;
+  function topBottom(arr,n){
+    const top=arr.slice(0,n),bot=arr.slice(-n).reverse();return{top,bot};
   }
-  $('#summary-week').innerHTML=renderBlock(wkEvts,'📅 本周概览');
-  $('#summary-month').innerHTML=renderBlock(moEvts,'📅 本月概览');
+  function renderBlock(evts,label){
+    const byP=sumByPerson(evts),total=evts.reduce((s,e)=>s+e.score,0),tb=topBottom(byP,3);
+    let h=`<div class="section-label" style="margin-top:0;">${label}</div>`;
+    if(evts.length===0)h+=`<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">暂无记录</div>`;
+    else{h+=`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;"><span style="color:var(--text2);">${evts.length} 条记录</span><span style="font-weight:700;color:${total>=0?'var(--positive)':'var(--negative)'};">${scoreText(total)}</span></div>`;
+      h+=`<div style="font-size:11px;color:var(--text3);margin-bottom:2px;">加分最多</div>`;
+      tb.top.forEach(([pid,s])=>{const p=getPerson(pid);if(!p)return;h+=`<div style="display:flex;justify-content:space-between;padding:3px 4px;font-size:13px;"><span>${esc(p.name)}</span><span style="font-weight:600;color:${s>=0?'var(--positive)':'var(--negative)'};">${scoreText(s)}</span></div>`});
+      h+=`<div style="font-size:11px;color:var(--text3);margin:6px 0 2px;">减分最多</div>`;
+      tb.bot.slice(0,3).forEach(([pid,s])=>{const p=getPerson(pid);if(!p||s>=0)return;h+=`<div style="display:flex;justify-content:space-between;padding:3px 4px;font-size:13px;"><span>${esc(p.name)}</span><span style="font-weight:600;color:var(--negative)';">${scoreText(s)}</span></div>`});
+      if(tb.bot.filter(([,s])=>s<0).length===0)h+=`<div style="color:var(--text3);font-size:12px;padding:3px 4px;">无扣分记录 🎉</div>`;
+    }return h;
+  }
+  // Summary stats
+  const totPeople=data.people.length,totEvents=data.events.length,totScore=data.events.reduce((s,e)=>s+e.score,0);
+  $('#summary-stats').innerHTML=`<div class="summary-stat"><div class="big">${totPeople}</div><div class="lbl">人物</div></div><div class="summary-stat"><div class="big">${totEvents}</div><div class="lbl">记录</div></div><div class="summary-stat"><div class="big" style="color:${totScore>=0?'var(--positive)':'var(--negative)'}">${scoreText(totScore)}</div><div class="lbl">总分数</div></div>`;
+  $('#summary-week').innerHTML=renderBlock(wkEvts,'📅 本周');
+  $('#summary-month').innerHTML=renderBlock(moEvts,'📅 本月');
   // Compare
-  const ppl=data.people,$ca=$('#compare-a'),$cb=$('#compare-b'),opt=ppl.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
-  $ca.innerHTML=$cb.innerHTML=opt;if(ppl.length>=2){$cb.value=ppl[1].id}
-  function renderCompare(){const pa=getPerson($ca.value),pb=getPerson($cb.value);if(!pa||!pb){$('#compare-result').innerHTML='';return}
-    const sa=getScore(pa.id),sb=getScore(pb.id),sca=scoreClass(sa),scb=scoreClass(sb);
-    let h=`<div class="compare-grid"><div class="compare-stat"><div class="val ${sca}">${scoreText(sa)}</div><div class="lbl">${esc(pa.name)} 总分</div></div><div class="compare-stat"><div class="val ${scb}">${scoreText(sb)}</div><div class="lbl">${esc(pb.name)} 总分</div></div></div>`;
-    // Category breakdown
+  const ppl=data.people,opt=ppl.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  $('#compare-a').innerHTML=$('#compare-b').innerHTML=opt;if(ppl.length>=2){$('#compare-b').value=ppl[1].id}
+  function renderCompare(){const pa=getPerson($('#compare-a').value),pb=getPerson($('#compare-b').value);if(!pa||!pb){$('#compare-result').innerHTML='';return}
+    const sa=getScore(pa.id),sb=getScore(pb.id);let h=`<div class="compare-grid"><div class="compare-box"><div class="val ${scoreClass(sa)}">${scoreText(sa)}</div><div class="lbl">${esc(pa.name)}</div></div><div class="compare-box"><div class="val ${scoreClass(sb)}">${scoreText(sb)}</div><div class="lbl">${esc(pb.name)}</div></div></div>`;
     const allCats=new Set([...data.events.filter(e=>e.personId===pa.id||e.personId===pb.id).map(e=>e.category||'其他')]);
-    h+=`<div class="compare-cats">`;
-    allCats.forEach(c=>{const va=data.events.filter(e=>e.personId===pa.id&&(e.category||'其他')===c).reduce((s,e)=>s+e.score,0);const vb=data.events.filter(e=>e.personId===pb.id&&(e.category||'其他')===c).reduce((s,e)=>s+e.score,0);h+=`<div class="compare-cat-row"><span style="min-width:70px;color:${va>=0?'var(--positive)':'var(--negative)'};font-weight:600;">${scoreText(va)}</span><span style="color:var(--secondary);">${c}</span><span style="min-width:70px;text-align:right;color:${vb>=0?'var(--positive)':'var(--negative)'};font-weight:600;">${scoreText(vb)}</span></div>`});
-    h+=`</div>`;
+    allCats.forEach(c=>{const va=data.events.filter(e=>e.personId===pa.id&&(e.category||'其他')===c).reduce((s,e)=>s+e.score,0);const vb=data.events.filter(e=>e.personId===pb.id&&(e.category||'其他')===c).reduce((s,e)=>s+e.score,0);h+=`<div class="compare-cat-row"><span style="font-weight:600;color:${va>=0?'var(--positive)':'var(--negative)'};width:55px;">${scoreText(va)}</span><span style="color:var(--text2);flex:1;text-align:center;">${c}</span><span style="font-weight:600;color:${vb>=0?'var(--positive)':'var(--negative)'};width:55px;text-align:right;">${scoreText(vb)}</span></div>`});
     $('#compare-result').innerHTML=h;
   }
-  $ca.onchange=renderCompare;$cb.onchange=renderCompare;if(ppl.length>=2)renderCompare();
+  $('#compare-a').onchange=renderCompare;$('#compare-b').onchange=renderCompare;if(ppl.length>=2)renderCompare();
 }
 
-// ── Settings ──────────────────────
-function renderSettingsTab(){
-  const list=$('#manage-people-list');
-  if(data.people.length===0){list.innerHTML='<div style="color:var(--secondary);font-size:14px;padding:8px 0;">暂无人物</div>'}else{
-    list.innerHTML=data.people.map(p=>`<div class="manage-person-row"><span class="manage-person-name">${esc(p.name)}${p.group?' <span style="font-size:12px;color:var(--secondary);">#'+esc(p.group)+'</span>':''}</span><div style="display:flex;gap:6px;align-items:center;"><select class="group-sel" data-pid="${p.id}" style="height:30px;border:1px solid var(--border);border-radius:6px;font-size:12px;">${GROUPS.slice(1).map(g=>`<option value="${g}"${(p.group||'其他')===g?' selected':''}>${g}</option>`).join('')}</select><button class="btn-danger" data-pid="${p.id}">删除</button></div></div>`).join('');
-    list.querySelectorAll('.btn-danger').forEach(b=>{b.onclick=()=>deletePerson(b.dataset.pid)});
-    list.querySelectorAll('.group-sel').forEach(sel=>{sel.onchange=function(){const p=getPerson(this.dataset.pid);if(p){p.group=this.value;save()}}});
-  }
+// ═══ Settings ═══════════════════
+function renderSettings(){
+  const list=$('#manage-people-list'),gs=data.settings.groups||DEF_GROUPS;
+  if(data.people.length===0)list.innerHTML='<div style="color:var(--text2);font-size:13px;padding:8px 0;">暂无人物</div>';
+  else list.innerHTML=data.people.map(p=>`<div class="manage-person-row"><span class="manage-person-name">${esc(p.name)}</span><div style="display:flex;gap:6px;align-items:center;"><select class="group-sel" data-pid="${p.id}">${gs.map(g=>`<option value="${g}"${(p.group||'其他')===g?' selected':''}>${g}</option>`).join('')}</select><button class="btn-danger" data-pid="${p.id}">删除</button></div></div>`).join('');
+  list.querySelectorAll('.btn-danger').forEach(b=>{b.onclick=()=>deletePerson(b.dataset.pid)});
+  list.querySelectorAll('.group-sel').forEach(sel=>{sel.onchange=function(){const p=getPerson(this.dataset.pid);if(p){p.group=this.value;save()}}});
+
   // Quick score
   const qs=data.settings.quickScore||5;
-  $$('#qscore-selector .theme-opt').forEach(o=>o.classList.toggle('active',parseInt(o.dataset.v)===qs));
+  $$('#qscore-row .theme-opt').forEach(o=>o.classList.toggle('active',parseInt(o.dataset.v)===qs));
+  // Vibrate toggle
+  const vt=data.settings.vibrate!==false;$('#vibrate-toggle').classList.toggle('on',vt);
   // Theme
-  const ct=data.settings.theme;$$('#theme-selector .theme-opt').forEach(o=>o.classList.toggle('active',o.dataset.theme===ct));
-  // Category manager
-  const cats=data.settings.categories||DEF_CATS;
-  $('#cat-mgr').innerHTML=`<div class="input-row"><input type="text" id="new-cat-input" class="text-input" placeholder="新分类名" maxlength="10"><button id="add-cat-btn" class="btn-sm">添加</button></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;" id="cat-list">${cats.map(c=>`<span class="cat-chip" style="position:relative;padding-right:28px;">${esc(c)}<span style="position:absolute;right:4px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:14px;opacity:0.5;" data-rm="${esc(c)}">×</span></span>`).join('')}</div>`;
-  $('#add-cat-btn').onclick=()=>{const v=$('#new-cat-input').value.trim();if(!v)return;if(cats.includes(v)){toast('已存在');return}cats.push(v);save();toast('已添加');renderSettingsTab()};
-  $('#cat-list').querySelectorAll('[data-rm]').forEach(x=>{x.onclick=()=>{const i=cats.indexOf(x.dataset.rm);if(i>-1){cats.splice(i,1);save();toast('已删除');renderSettingsTab()}}});
-  // Template manager
-  const tmpls=data.settings.noteTemplates||[];
-  $('#tmpl-mgr').innerHTML=`<div class="input-row"><input type="text" id="new-tmpl-input" class="text-input" placeholder="模板内容" maxlength="30"><button id="add-tmpl-btn" class="btn-sm">添加</button></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;" id="tmpl-list">${tmpls.map(t=>`<span class="tmpl-chip" style="position:relative;padding-right:28px;border:1px solid var(--border);">${esc(t)}<span style="position:absolute;right:4px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:14px;opacity:0.5;" data-rm="${esc(t)}">×</span></span>`).join('')}</div>`;
-  $('#add-tmpl-btn').onclick=()=>{const v=$('#new-tmpl-input').value.trim();if(!v)return;if(tmpls.includes(v)){toast('已存在');return}tmpls.push(v);save();toast('已添加');renderSettingsTab()};
-  $('#tmpl-list').querySelectorAll('[data-rm]').forEach(x=>{x.onclick=()=>{const i=tmpls.indexOf(x.dataset.rm);if(i>-1){tmpls.splice(i,1);save();toast('已删除');renderSettingsTab()}}});
+  const ct=data.settings.theme;$$('#theme-row .theme-opt').forEach(o=>o.classList.toggle('active',o.dataset.theme===ct));
+  // Categories
+  const cats=data.settings.categories||DEF_CATS;$('#cat-list').innerHTML=cats.map(c=>`<span class="manage-chip">${esc(c)}<span class="rm" data-rm="${esc(c)}">×</span></span>`).join('');
+  $('#cat-list').querySelectorAll('.rm').forEach(x=>{x.onclick=()=>removeCategory(x.dataset.rm)});
+  // Templates
+  const tmpls=data.settings.noteTemplates||[];$('#tmpl-list').innerHTML=tmpls.map(t=>`<span class="manage-chip">${esc(t)}<span class="rm" data-rm="${esc(t)}">×</span></span>`).join('');
+  $('#tmpl-list').querySelectorAll('.rm').forEach(x=>{x.onclick=()=>{const i=tmpls.indexOf(x.dataset.rm);if(i>-1){tmpls.splice(i,1);save();toast('已删除');renderSettings()}}});
+  // Groups
+  $('#group-list').innerHTML=gs.map(g=>`<span class="manage-chip">${esc(g)}<span class="rm" data-rm="${esc(g)}">×</span></span>`).join('');
+  $('#group-list').querySelectorAll('.rm').forEach(x=>{x.onclick=()=>{const i=data.settings.groups.indexOf(x.dataset.rm);if(i>-1){data.settings.groups.splice(i,1);data.people.forEach(p=>{if(p.group===x.dataset.rm)p.group='其他'});save();toast('已删除');renderSettings()}}});
 }
 
 function esc(s){const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};return s.replace(/[&<>"']/g,c=>m[c])}
 
-// ── Export/Import ─────────────────
-function exportData(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='人际记分备份_'+todayStr()+'.json';a.click();URL.revokeObjectURL(u);toast('已导出')}
-function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{const t=await f.text(),im=JSON.parse(t);if(!im.people||!im.events)throw new Error('Invalid');const ok=await confirmDialog('导入将覆盖当前所有数据（人物 '+im.people.length+' 个，记录 '+im.events.length+' 条），确定继续？');if(!ok)return;data=im;if(!data.settings)data.settings={pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[]};if(!data.settings.quickScore)data.settings.quickScore=5;if(!data.settings.categories)data.settings.categories=[...DEF_CATS];if(!data.settings.noteTemplates)data.settings.noteTemplates=[];data.events.forEach(e=>{if(!e.category)e.category='其他'});data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group)p.group='其他'});selectedPersonId=data.people.length>0?data.people[0].id:null;currentScore=null;detailPersonId=null;applyTheme();save();render();toast('导入成功')}catch(e){toast('文件格式错误')}};inp.click()}
-async function resetAll(){const ok=await confirmDialog('确定要清除所有数据吗？此操作不可恢复！');if(!ok)return;data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[]}};selectedPersonId=null;currentScore=null;detailPersonId=null;applyTheme();save();render();toast('已清除全部数据')}
-async function setupPin(){if(data.settings.pin){const ok=await confirmDialog('已设置密码，要修改吗？','修改','modal-primary');if(!ok)return}showPinScreen('setup')}
-async function removePin(){const ok=await confirmDialog('确定要移除密码吗？');if(!ok)return;data.settings.pin=null;save();updatePinButton();toast('密码已移除')}
+// ═══ Export/Import ══════════════
+function exportData(){
+  const exp={people:data.people,events:data.events,settings:{theme:data.settings.theme,quickScore:data.settings.quickScore,categories:data.settings.categories,noteTemplates:data.settings.noteTemplates,groups:data.settings.groups,vibrate:data.settings.vibrate}};
+  const b=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='人际记分备份_'+todayStr()+'.json';a.click();URL.revokeObjectURL(u);toast('已导出（不含密码）')
+}
+function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{const t=await f.text(),im=JSON.parse(t);if(!im.people||!im.events)throw new Error();const ok=await confirmDialog(`导入 ${im.people.length} 人、${im.events.length} 条记录？`);if(!ok)return;data.people=im.people;data.events=im.events;data.settings=im.settings||{};data.settings.pin=null;if(!data.settings.theme)data.settings.theme='auto';if(!data.settings.quickScore)data.settings.quickScore=5;if(!data.settings.categories)data.settings.categories=[...DEF_CATS];if(!data.settings.noteTemplates)data.settings.noteTemplates=[...DEF_TMPLS];if(!data.settings.groups)data.settings.groups=[...DEF_GROUPS];if(data.settings.vibrate===undefined)data.settings.vibrate=true;data.events.forEach(e=>{if(!e.category)e.category='其他'});data.people.forEach(p=>{if(!p.group||!data.settings.groups.includes(p.group))p.group='其他';if(p.note===undefined)p.note=''});selectedPersonId=data.people.length>0?data.people[0].id:null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('导入成功')}catch(e){toast('文件格式错误')}};inp.click()}
+async function resetAll(){const ok=await confirmDialog('清除全部数据？不可恢复！');if(!ok)return;data={people:[],events:[],settings:{pin:null,theme:data.settings.theme,quickScore:data.settings.quickScore,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:data.settings.vibrate}};selectedPersonId=null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('已清除')}
+async function setupPin(){if(data.settings.pin){const ok=await confirmDialog('已设置密码，修改？','修改','modal-primary');if(!ok)return}showPinScreen('setup')}
+async function removePin(){const ok=await confirmDialog('移除密码？');if(!ok)return;data.settings.pin=null;save();updatePinBtn();toast('密码已移除')}
 window._goSettings=()=>switchTab('settings');
 
-// ── Bind ──────────────────────────
+// ═══ Bind ═══════════════════════
 function bind(){
   $$('.tab-btn').forEach(b=>{b.onclick=()=>switchTab(b.dataset.tab)});$('.back-btn').onclick=goBack;$('#save-btn').onclick=handleSaveEvent;
   $('#custom-score').oninput=function(){if(this.value===''||this.value==='-'){currentScore=null;updateSaveBtn();renderScorePresets();return}setCustomScore(this.value)};
   $('#note-input').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('#custom-score').focus()}};
-  $('#add-person-btn').onclick=()=>{addPerson($('#new-person-input').value);$('#new-person-input').value=''};$('#new-person-input').onkeydown=function(e){if(e.key==='Enter'){addPerson(this.value);this.value=''}};
-  $('#export-btn').onclick=exportData;$('#import-btn').onclick=importData;$('#reset-btn').onclick=resetAll;
-  $$('#theme-selector .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.theme=o.dataset.theme;applyTheme();save();renderSettingsTab()}});
-  $$('#qscore-selector .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.quickScore=parseInt(o.dataset.v);save();toast('快捷分值设为 ±'+o.dataset.v);renderSettingsTab()}});
-  $('#pin-setup-btn').onclick=setupPin;$('#pin-remove-btn').onclick=removePin;
-  $('#event-search').oninput=function(){searchQuery=this.value;renderDetailScreen()};
+  $('#add-person-btn').onclick=()=>{addPerson($('#new-person-input').value);$('#new-person-input').value=''};$('#new-person-input').onkeydown=function(e){if(e.key==='Enter'){addPerson(this.value);this.value=''}};$('#export-btn').onclick=exportData;$('#import-btn').onclick=importData;$('#reset-btn').onclick=resetAll;
+  $$('#theme-row .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.theme=o.dataset.theme;applyTheme();save();renderSettings()}});
+  $$('#qscore-row .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.quickScore=parseInt(o.dataset.v);save();toast('快捷分值 ±'+o.dataset.v);renderSettings()}});
+  $('#vibrate-toggle').onclick=function(){data.settings.vibrate=!data.settings.vibrate;this.classList.toggle('on',data.settings.vibrate);save()};
+  $('#pin-setup-btn').onclick=setupPin;$('#pin-remove-btn').onclick=removePin;$('#event-search').oninput=function(){searchQuery=this.value;renderDetail()};
+  $('#add-cat-btn').onclick=()=>{const v=$('#new-cat-input').value.trim();if(!v)return;const cats=data.settings.categories;if(cats.includes(v)){toast('已存在');return}cats.push(v);save();toast('已添加');renderSettings()};
+  $('#add-tmpl-btn').onclick=()=>{const v=$('#new-tmpl-input').value.trim();if(!v)return;const tmpls=data.settings.noteTemplates;if(tmpls.includes(v)){toast('已存在');return}tmpls.push(v);save();toast('已添加');renderSettings()};
+  $('#add-group-btn').onclick=()=>{const v=$('#new-group-input').value.trim();if(!v)return;const gs=data.settings.groups;if(gs.includes(v)){toast('已存在');return}gs.push(v);save();toast('已添加');renderSettings()};
 }
 
-function init(){
-  load();applyTheme();initPinScreen();
-  if(data.people.length===1)selectedPersonId=data.people[0].id;
-  if(data.settings.pin&&!unlocked){bind();showPinScreen('enter')}else{bind();render()}
-}
+function init(){load();applyTheme();initPinScreen();if(data.people.length===1)selectedPersonId=data.people[0].id;if(data.settings.pin&&!unlocked){bind();showPinScreen('enter')}else{bind();render()}}
 init();
 })();
 </script>
