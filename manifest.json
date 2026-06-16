@@ -1,10 +1,20 @@
 {
   "name": "人际记分",
   "short_name": "人际记分",
-  "description": "记录人际行为，评估关系价值",
+  "description": "记录人际行为，评估关系价值 — 零依赖个人关系管理工具",
   "start_url": "/person-score/",
   "display": "standalone",
   "background_color": "#f2f2f7",
   "theme_color": "#007AFF",
-  "lang": "zh-CN"
+  "lang": "zh-CN",
+  "orientation": "portrait",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
