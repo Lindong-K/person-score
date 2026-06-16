@@ -168,6 +168,7 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 .event-score{width:48px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
 .event-score.pos{background:var(--positive)}.event-score.neg{background:var(--negative)}
 .event-body{flex:1;min-width:0}.event-note{font-size:15px;line-height:1.4;word-break:break-all}
+.event-reflection{font-size:13px;line-height:1.4;color:var(--text2);margin-top:2px;font-style:italic;padding-left:2px}
 .event-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
 .event-cat-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--primaryLight);color:var(--primary);font-weight:600}
 .event-date{font-size:11px;color:var(--text2)}
@@ -249,6 +250,7 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 <div class="section-label">发生日期</div><input type="date" id="event-date" class="date-input">
 <div class="section-label">事件备注</div><textarea id="note-input" class="note-textarea" placeholder="TA做了什么...（可选）"></textarea>
 <div id="tmpl-chips" class="tmpl-chips"></div>
+<div class="section-label">我的看法</div><textarea id="reflection-input" class="note-textarea note-reflection" placeholder="你怎么看这件事...（可选）" maxlength="200" style="min-height:44px;"></textarea>
 <div class="section-label">分类标签</div><div id="cat-chips" class="cat-chips"></div>
 <div class="section-label">评分</div>
 <div class="score-presets"><div class="preset-row" id="neg-presets"></div><div class="preset-row" id="pos-presets"></div></div>
@@ -349,7 +351,7 @@ function load(){
     s.categories=s.categories||[...DEF_CATS];s.noteTemplates=s.noteTemplates||[...DEF_TMPLS];
     s.groups=s.groups||[...DEF_GROUPS];if(s.vibrate===undefined)s.vibrate=true;
     if(s.pin===undefined)s.pin=null;data.settings=s;
-    data.events.forEach(e=>{if(!e.category)e.category='其他'});
+    data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});
     data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group||!s.groups.includes(p.group))p.group='其他'});
   }
 }
@@ -412,8 +414,8 @@ function goBack(){detailPersonId=null;currentTab='people';render()}
 function addPerson(name){name=name.trim();if(!name){toast('请输入姓名');return}if(data.people.some(p=>p.name===name)){toast('该名字已存在');return}data.people.push({id:uid(),name,note:'',group:'其他',createdAt:new Date().toISOString()});if(data.people.length===1)selectedPersonId=data.people[0].id;save();render();toast('已添加 '+name)}
 async function deletePerson(id){const p=getPerson(id);if(!p)return;const n=data.events.filter(e=>e.personId===id).length;const ok=await confirmDialog('删除「'+esc(p.name)+'」及 '+n+' 条记录？');if(!ok)return;data.people=data.people.filter(x=>x.id!==id);data.events=data.events.filter(e=>e.personId!==id);if(selectedPersonId===id)selectedPersonId=data.people.length>0?data.people[0].id:null;if(detailPersonId===id)goBack();save();render();toast('已删除 '+esc(p.name))}
 
-function addEvent(pid,score,note,cat,dateStr){
-  const ev={id:uid(),personId:pid,score,note:note||'（无备注）',category:cat||'其他',createdAt:(dateStr||todayStr())+'T'+new Date().toTimeString().slice(0,8)};
+function addEvent(pid,score,note,cat,dateStr,reflection){
+  const ev={id:uid(),personId:pid,score,note:note||'（无备注）',category:cat||'其他',createdAt:(dateStr||todayStr())+'T'+new Date().toTimeString().slice(0,8),reflection:reflection||''};
   data.events.push(ev);undoStack.push(ev.id);if(undoStack.length>MAX_UNDO)undoStack.shift();save();return ev;
 }
 function undoLastEvent(){
@@ -424,8 +426,8 @@ function undoLastEvent(){
 function handleSaveEvent(){
   if(!selectedPersonId||currentScore===null||currentScore===0)return;
   const dateStr=$('#event-date').value||todayStr();
-  const ev=addEvent(selectedPersonId,currentScore,$('#note-input').value.trim(),currentCategory,dateStr);
-  $('#note-input').value='';currentScore=null;currentCategory='其他';$('#custom-score').value='';
+  const ev=addEvent(selectedPersonId,currentScore,$('#note-input').value.trim(),currentCategory,dateStr,$('#reflection-input').value.trim());
+  $('#note-input').value='';$('#reflection-input').value='';currentScore=null;currentCategory='其他';$('#custom-score').value='';
   haptic();render();toast('已记录 '+scoreText(ev.score),undoLastEvent);
 }
 function quickScore(pid,score){
@@ -456,17 +458,17 @@ function attachSwipe(card,eid){
 function showEditModal(event){
   return new Promise(resolve=>{
     const presets=[-20,-10,-5,-3,-1,1,3,5,10,20],cats=getCats();
-    let es=event.score,en=event.note.startsWith('快捷')||event.note==='（无备注）'?'':event.note;
+    let es=event.score,en=event.note.startsWith('快捷')||event.note==='（无备注）'?'':event.note,er=event.reflection||'';
     let ec=event.category||'其他',ed=fmtDateFull(event.createdAt);
     const ov=document.createElement('div');ov.className='modal-overlay';
-    function rm(){ov.innerHTML=`<div class="modal-box"><div style="font-size:18px;font-weight:700;margin-bottom:14px;">编辑记录</div><div class="edit-label">评分</div><div class="edit-score-row">${presets.map(v=>`<button class="edit-score-btn ${v>0?'pos':'neg'}${es===v?' selected':''}" data-sv="${v}">${scoreText(v)}</button>`).join('')}</div><div style="text-align:center;margin-bottom:10px;"><input type="number" class="custom-score-input" style="width:80px;" value="${es}" placeholder="自定义"></div><div class="edit-label">分类</div><div class="cat-chips" style="justify-content:center;margin-bottom:10px;">${cats.map(c=>`<span class="cat-chip${ec===c?' selected':''}" data-cat="${c}">${c}</span>`).join('')}</div><div class="edit-label">日期</div><input type="date" class="date-input" value="${ed}" style="margin-bottom:10px;"><div class="edit-label">备注</div><textarea class="note-textarea edit-note" style="min-height:52px;margin-bottom:4px;">${esc(en)}</textarea><div class="modal-actions" style="margin-top:16px;"><button class="modal-cancel">取消</button><button class="modal-primary">保存</button></div></div>`;document.body.appendChild(ov);
-    ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();resolve(null)};ov.querySelector('.modal-primary').onclick=()=>{ov.remove();resolve({score:es,note:en,category:ec,date:ed})};ov.onclick=e=>{if(e.target===ov){ov.remove();resolve(null)}};
-    ov.querySelectorAll('.edit-score-btn').forEach(b=>{b.onclick=()=>{es=parseInt(b.dataset.sv);rmi(ov)}});const ci=ov.querySelector('.custom-score-input');ci.oninput=function(){const v=parseInt(this.value);if(!isNaN(v))es=v;rmi(ov)};ci.onkeydown=function(e){if(e.key==='Enter')e.preventDefault()};ov.querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{ec=ch.dataset.cat;rmi(ov)}});ov.querySelector('.edit-note').oninput=function(){en=this.value};ov.querySelector('.date-input').onchange=function(){ed=this.value};}
+    function rm(){ov.innerHTML=`<div class="modal-box"><div style="font-size:18px;font-weight:700;margin-bottom:14px;">编辑记录</div><div class="edit-label">评分</div><div class="edit-score-row">${presets.map(v=>`<button class="edit-score-btn ${v>0?'pos':'neg'}${es===v?' selected':''}" data-sv="${v}">${scoreText(v)}</button>`).join('')}</div><div style="text-align:center;margin-bottom:10px;"><input type="number" class="custom-score-input" style="width:80px;" value="${es}" placeholder="自定义"></div><div class="edit-label">分类</div><div class="cat-chips" style="justify-content:center;margin-bottom:10px;">${cats.map(c=>`<span class="cat-chip${ec===c?' selected':''}" data-cat="${c}">${c}</span>`).join('')}</div><div class="edit-label">日期</div><input type="date" class="date-input" value="${ed}" style="margin-bottom:10px;"><div class="edit-label">备注</div><textarea class="note-textarea edit-note" style="min-height:48px;margin-bottom:4px;">${esc(en)}</textarea><div class="edit-label">我的看法</div><textarea class="note-textarea edit-reflection" style="min-height:44px;margin-bottom:4px;" placeholder="你的看法...">${esc(er)}</textarea><div class="modal-actions" style="margin-top:16px;"><button class="modal-cancel">取消</button><button class="modal-primary">保存</button></div></div>`;document.body.appendChild(ov);
+    ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();resolve(null)};ov.querySelector('.modal-primary').onclick=()=>{ov.remove();resolve({score:es,note:en,category:ec,date:ed,reflection:er})};ov.onclick=e=>{if(e.target===ov){ov.remove();resolve(null)}};
+    ov.querySelectorAll('.edit-score-btn').forEach(b=>{b.onclick=()=>{es=parseInt(b.dataset.sv);rmi(ov)}});const ci=ov.querySelector('.custom-score-input');ci.oninput=function(){const v=parseInt(this.value);if(!isNaN(v))es=v;rmi(ov)};ci.onkeydown=function(e){if(e.key==='Enter')e.preventDefault()};ov.querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{ec=ch.dataset.cat;rmi(ov)}});ov.querySelector('.edit-note').oninput=function(){en=this.value};ov.querySelector('.edit-reflection').oninput=function(){er=this.value};ov.querySelector('.date-input').onchange=function(){ed=this.value};}
     function rmi(ov){ov.querySelectorAll('.edit-score-btn').forEach(b=>b.classList.toggle('selected',parseInt(b.dataset.sv)===es));const ci=ov.querySelector('.custom-score-input');if(ci!==document.activeElement)ci.value=es;ov.querySelectorAll('.cat-chip').forEach(ch=>ch.classList.toggle('selected',ch.dataset.cat===ec))}
     rm();
   })
 }
-async function editEvent(eid){const ev=data.events.find(e=>e.id===eid);if(!ev)return;const r=await showEditModal(ev);if(!r)return;ev.score=r.score;ev.note=r.note||'（无备注）';ev.category=r.category;if(r.date)ev.createdAt=r.date+'T'+new Date(ev.createdAt).toTimeString().slice(0,8);save();render();toast('已更新')}
+async function editEvent(eid){const ev=data.events.find(e=>e.id===eid);if(!ev)return;const r=await showEditModal(ev);if(!r)return;ev.score=r.score;ev.note=r.note||'（无备注）';ev.category=r.category;if(r.reflection!==undefined)ev.reflection=r.reflection;if(r.date)ev.createdAt=r.date+'T'+new Date(ev.createdAt).toTimeString().slice(0,8);save();render();toast('已更新')}
 
 // ═══ Sparkline ══════════════════
 function sparkline(pid){
@@ -555,11 +557,11 @@ function renderDetail(part){
   }
   let events=getEvents(detailPersonId);
   if(timeFilter!=='全部'){const cutoff=timeFilter==='本周'?weekStart():timeFilter==='本月'?monthStart():monthsAgo(3);events=events.filter(e=>new Date(e.createdAt)>=cutoff)}
-  const q=searchQuery.toLowerCase().trim(),filtered=q?events.filter(e=>e.note.toLowerCase().includes(q)||(e.category||'其他').includes(q)):events;
+  const q=searchQuery.toLowerCase().trim(),filtered=q?events.filter(e=>e.note.toLowerCase().includes(q)||(e.category||'其他').includes(q)||(e.reflection||'').toLowerCase().includes(q)):events;
   if(q&&filtered.length!==events.length){$('#search-count').textContent=`找到 ${filtered.length} 条（共 ${events.length} 条）`;$('#search-count').classList.add('show')}else{$('#search-count').classList.remove('show')}
   const ct=$('#events-list');
   if(filtered.length===0){ct.innerHTML=q?`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">没有匹配的记录</div></div>`:`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">还没有任何记录<br>去「记录」页面添加吧</div></div>`;$('.swipe-hint').style.display='none'}else{
-    ct.innerHTML=filtered.map(e=>`<div class="event-card-wrap"><div class="delete-bg">删除</div><div class="event-card" data-eid="${e.id}"><div class="event-score ${scoreClass(e.score)}">${scoreText(e.score)}</div><div class="event-body"><div class="event-note">${esc(e.note)}</div><div class="event-meta"><span class="event-cat-badge">${esc(e.category||'其他')}</span><span class="event-date">${fmtDate(e.createdAt)}</span></div></div><button class="event-del-btn" data-eid="${e.id}">✕</button></div></div>`).join('');
+    ct.innerHTML=filtered.map(e=>`<div class="event-card-wrap"><div class="delete-bg">删除</div><div class="event-card" data-eid="${e.id}"><div class="event-score ${scoreClass(e.score)}">${scoreText(e.score)}</div><div class="event-body"><div class="event-note">${esc(e.note)}</div>${e.reflection?`<div class="event-reflection">💭 ${esc(e.reflection)}</div>`:''}<div class="event-meta"><span class="event-cat-badge">${esc(e.category||'其他')}</span><span class="event-date">${fmtDate(e.createdAt)}</span></div></div><button class="event-del-btn" data-eid="${e.id}">✕</button></div></div>`).join('');
     ct.querySelectorAll('.event-card').forEach(c=>{attachSwipe(c,c.dataset.eid)});ct.querySelectorAll('.event-del-btn').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();deleteEvent(b.dataset.eid)}});
     $('.swipe-hint').style.display='block';
   }
@@ -635,7 +637,7 @@ function exportData(){
   const exp={people:data.people,events:data.events,settings:{theme:data.settings.theme,quickScore:data.settings.quickScore,categories:data.settings.categories,noteTemplates:data.settings.noteTemplates,groups:data.settings.groups,vibrate:data.settings.vibrate}};
   const b=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='人际记分备份_'+todayStr()+'.json';a.click();URL.revokeObjectURL(u);toast('已导出（不含密码）')
 }
-function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{const t=await f.text(),im=JSON.parse(t);if(!im.people||!im.events)throw new Error();const ok=await confirmDialog(`导入 ${im.people.length} 人、${im.events.length} 条记录？`);if(!ok)return;data.people=im.people;data.events=im.events;const hadPin=!!(im.settings&&im.settings.pin);data.settings=im.settings||{};data.settings.pin=null;if(!data.settings.theme)data.settings.theme='auto';if(!data.settings.quickScore)data.settings.quickScore=5;if(!data.settings.categories)data.settings.categories=[...DEF_CATS];if(!data.settings.noteTemplates)data.settings.noteTemplates=[...DEF_TMPLS];if(!data.settings.groups)data.settings.groups=[...DEF_GROUPS];if(data.settings.vibrate===undefined)data.settings.vibrate=true;data.events.forEach(e=>{if(!e.category)e.category='其他'});data.people.forEach(p=>{if(!p.group||!data.settings.groups.includes(p.group))p.group='其他';if(p.note===undefined)p.note=''});selectedPersonId=data.people.length>0?data.people[0].id:null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('导入成功'+(hadPin?'（密码已移除）':''))}catch(e){toast('文件格式错误')}};inp.click()}
+function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{const t=await f.text(),im=JSON.parse(t);if(!im.people||!im.events)throw new Error();const ok=await confirmDialog(`导入 ${im.people.length} 人、${im.events.length} 条记录？`);if(!ok)return;data.people=im.people;data.events=im.events;const hadPin=!!(im.settings&&im.settings.pin);data.settings=im.settings||{};data.settings.pin=null;if(!data.settings.theme)data.settings.theme='auto';if(!data.settings.quickScore)data.settings.quickScore=5;if(!data.settings.categories)data.settings.categories=[...DEF_CATS];if(!data.settings.noteTemplates)data.settings.noteTemplates=[...DEF_TMPLS];if(!data.settings.groups)data.settings.groups=[...DEF_GROUPS];if(data.settings.vibrate===undefined)data.settings.vibrate=true;data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});data.people.forEach(p=>{if(!p.group||!data.settings.groups.includes(p.group))p.group='其他';if(p.note===undefined)p.note=''});selectedPersonId=data.people.length>0?data.people[0].id:null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('导入成功'+(hadPin?'（密码已移除）':''))}catch(e){toast('文件格式错误')}};inp.click()}
 async function resetAll(){const ok=await confirmDialog('清除全部数据？不可恢复！');if(!ok)return;data={people:[],events:[],settings:{pin:null,theme:data.settings.theme,quickScore:data.settings.quickScore,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:data.settings.vibrate}};selectedPersonId=null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('已清除')}
 async function setupPin(){if(data.settings.pin){const ok=await confirmDialog('已设置密码，修改？','修改','modal-primary');if(!ok)return}showPinScreen('setup')}
 async function removePin(){const ok=await confirmDialog('移除密码？');if(!ok)return;data.settings.pin=null;save();updatePinBtn();toast('密码已移除')}
