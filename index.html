@@ -145,7 +145,7 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 .person-note-edit{width:100%;font-size:13px;padding:10px 14px;border:1.5px solid var(--primary);border-radius:10px;background:var(--card);color:var(--text);font-family:inherit;resize:none;min-height:64px;-webkit-appearance:none;margin-bottom:12px;transition:all 0.2s}.person-note-edit:focus{outline:none;box-shadow:0 0 0 3px var(--primaryLight)}
 
 /* ═══════ Search & Time Filter ═══════ */
-.search-wrap{position:relative;margin-bottom:8px;background:var(--bg);padding:2px 0}.search-input{width:100%;height:40px;padding:0 14px 0 36px;border:1px solid var(--border);border-radius:22px;font-size:14px;background:var(--card);color:var(--text);-webkit-appearance:none;transition:all 0.2s}
+.search-wrap{position:relative;margin-bottom:8px;background:var(--bg);padding:2px 0}.search-input{width:100%;height:40px;padding:0 36px 0 36px;border:1px solid var(--border);border-radius:22px;font-size:14px;background:var(--card);color:var(--text);-webkit-appearance:none;transition:all 0.2s}
 .search-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primaryLight)}.search-wrap .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:0.5}
 .search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 8px;line-height:1}.search-clear:active{color:var(--text)}
 .search-count{font-size:11px;color:var(--text2);text-align:center;padding-top:4px;display:none}.search-count.show{display:block}
@@ -233,6 +233,9 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
 @media(min-width:480px){body{background:#e8e8ed}[data-theme="dark"] body{background:#000}#app{box-shadow:0 0 60px rgba(0,0,0,0.18)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.card,.card-section,.event-body,.person-note-text{user-select:text}
 </style>
 </head>
 <body>
@@ -339,6 +342,7 @@ let currentTab='record',detailPersonId=null,selectedPersonId=null,undoStack=[];
 let currentScore=null,currentCategory='其他',pinMode=null,pinEntry='',pinFirst='';
 let unlocked=sessionStorage.getItem('ps_u')==='1',toastTimer=null,_searchTimer=null;
 let searchQuery='',timeFilter='全部',groupFilter='全部',_peopleSearch='',_dataCorrupted=false;
+let _scoreCache=null,_eventsCache=null;
 
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
@@ -354,20 +358,19 @@ function load(){
     const s=data.settings;if(!s)s={};s.theme=s.theme||'auto';s.quickScore=s.quickScore||5;
     s.categories=s.categories||[...DEF_CATS];s.noteTemplates=s.noteTemplates||[...DEF_TMPLS];
     s.groups=s.groups||[...DEF_GROUPS];if(s.vibrate===undefined)s.vibrate=true;
-    if(s.pin===undefined)s.pin=null;data.settings=s;
+    if(s.pin===undefined)s.pin=null;if(s._lastBackup===undefined)s._lastBackup=null;data.settings=s;
     data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});
     data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group||!s.groups.includes(p.group))p.group='其他'});
   }
 }
-function save(){const exp={...data,settings:{...data.settings,pin:data.settings.pin}};localStorage.setItem('ps_data',JSON.stringify(exp))}
 
 // ═══ Helpers ═════════════════════
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function getPerson(id){return data.people.find(p=>p.id===id)}
-function getScore(pid){return data.events.filter(e=>e.personId===pid).reduce((s,e)=>s+e.score,0)}
-function getEvents(pid){return data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))}
+function getScore(pid){if(!_scoreCache)_scoreCache={};if(_scoreCache[pid]!==undefined)return _scoreCache[pid];const s=data.events.filter(e=>e.personId===pid).reduce((s,e)=>s+e.score,0);return _scoreCache[pid]=s}
+function getEvents(pid){if(!_eventsCache)_eventsCache={};if(_eventsCache[pid])return _eventsCache[pid];const ev=data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));return _eventsCache[pid]=ev}
 function getLastEvent(pid){const ev=getEvents(pid);return ev.length>0?ev[0]:null}
-function fmtDate(iso){const d=new Date(iso),n=new Date(),df=n-d,m=Math.floor(df/6e4),h=Math.floor(df/36e5),day=Math.floor(df/864e5);if(m<1)return'刚刚';if(m<60)return m+'分钟前';if(h<24)return h+'小时前';if(day<7)return day+'天前';const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');return y===n.getFullYear()?mo+'-'+da:y+'-'+mo+'-'+da}
+function fmtDate(iso){const d=new Date(iso),n=new Date(),df=n-d,m=Math.floor(df/6e4),h=Math.floor(df/36e5),day=Math.floor(df/864e5);if(df<0)return'日期超前';if(m<1)return'刚刚';if(m<60)return m+'分钟前';if(h<24)return h+'小时前';if(day<7)return day+'天前';const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');return y===n.getFullYear()?mo+'-'+da:y+'-'+mo+'-'+da}
 function fmtDateFull(iso){const d=new Date(iso);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function scoreClass(n){return n>0?'pos':n<0?'neg':''}
 function scoreText(n){return(n>0?'+':'')+n}
@@ -389,7 +392,7 @@ function toast(msg,undoAction){
 function hideToast(){$('#toast').classList.remove('show');clearTimeout(toastTimer)}
 
 // ═══ Confirm ═════════════════════
-function confirmDialog(msg,ctxt,cls){return new Promise(r=>{const ov=document.createElement('div');ov.className='modal-overlay';ov.innerHTML=`<div class="modal-box"><div class="modal-msg">${msg}</div><div class="modal-actions"><button class="modal-cancel">取消</button><button class="${cls||'modal-confirm'}">${ctxt||'确定'}</button></div></div>`;document.body.appendChild(ov);ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();r(false)};ov.querySelector('.modal-actions button:last-child').onclick=()=>{ov.remove();r(true)};ov.onclick=e=>{if(e.target===ov){ov.remove();r(false)}}})}
+function confirmDialog(msg,ctxt,cls){return new Promise(r=>{const ov=document.createElement('div');ov.className='modal-overlay';ov.innerHTML=`<div class="modal-box"><div class="modal-msg">${msg}</div><div class="modal-actions"><button class="modal-cancel">取消</button><button class="${cls||'modal-confirm'}">${ctxt||'确定'}</button></div></div>`;document.body.appendChild(ov);function close(v){ov.remove();document.removeEventListener('keydown',onKey);r(v)}const onKey=e=>{if(e.key==='Escape')close(false);if(e.key==='Enter')close(true)};document.addEventListener('keydown',onKey);ov.querySelector('.modal-cancel').onclick=()=>close(false);ov.querySelector('.modal-actions button:last-child').onclick=()=>close(true);ov.onclick=e=>{if(e.target===ov)close(false)}})}
 
 // ═══ PIN ═════════════════════════
 function initPinScreen(){
@@ -443,7 +446,7 @@ async function removeCategory(cat){if(cat==='其他'){toast('默认分类不可�
 
 function selectPerson(id){selectedPersonId=id;renderRecord()}
 function setScore(val){currentScore=val;$('#custom-score').value=val;renderScorePresets();updateSaveBtn()}
-function setCustomScore(val){const n=parseInt(val);currentScore=isNaN(n)?null:n;renderScorePresets();updateSaveBtn()}
+function setCustomScore(val){const n=parseInt(val);if(!isNaN(n)&&(n<-100||n>100)){toast('分值范围 -100 ~ 100');return}currentScore=isNaN(n)?null:n;renderScorePresets();updateSaveBtn()}
 function updateSaveBtn(){$('#save-btn').disabled=!(selectedPersonId&&currentScore!==null&&currentScore!==0)}
 
 // ═══ Person Note ═════════════════
@@ -466,7 +469,7 @@ function showEditModal(event){
     let ec=event.category||'其他',ed=fmtDateFull(event.createdAt);
     const ov=document.createElement('div');ov.className='modal-overlay';
     function rm(){ov.innerHTML=`<div class="modal-box"><div style="font-size:18px;font-weight:700;margin-bottom:14px;">编辑记录</div><div class="edit-label">评分</div><div class="edit-score-row">${presets.map(v=>`<button class="edit-score-btn ${v>0?'pos':'neg'}${es===v?' selected':''}" data-sv="${v}">${scoreText(v)}</button>`).join('')}</div><div style="text-align:center;margin-bottom:10px;"><input type="number" class="custom-score-input" style="width:80px;" value="${es}" placeholder="自定义"></div><div class="edit-label">分类</div><div class="cat-chips" style="justify-content:center;margin-bottom:10px;">${cats.map(c=>`<span class="cat-chip${ec===c?' selected':''}" data-cat="${c}">${c}</span>`).join('')}</div><div class="edit-label">日期</div><input type="date" class="date-input" value="${ed}" style="margin-bottom:10px;"><div class="edit-label">备注</div><textarea class="note-textarea edit-note" style="min-height:48px;margin-bottom:4px;">${esc(en)}</textarea><div class="edit-label">我的看法</div><textarea class="note-textarea edit-reflection" style="min-height:44px;margin-bottom:4px;" placeholder="你的看法...">${esc(er)}</textarea><div class="modal-actions" style="margin-top:16px;"><button class="modal-cancel">取消</button><button class="modal-primary">保存</button></div></div>`;document.body.appendChild(ov);
-    ov.querySelector('.modal-cancel').onclick=()=>{ov.remove();resolve(null)};ov.querySelector('.modal-primary').onclick=()=>{ov.remove();resolve({score:es,note:en,category:ec,date:ed,reflection:er})};ov.onclick=e=>{if(e.target===ov){ov.remove();resolve(null)}};
+    function close(rv){ov.remove();document.removeEventListener('keydown',onKey);resolve(rv)}const onKey=e=>{if(e.key==='Escape')close(null)};document.addEventListener('keydown',onKey);ov.querySelector('.modal-cancel').onclick=()=>close(null);ov.querySelector('.modal-primary').onclick=()=>close({score:es,note:en,category:ec,date:ed,reflection:er});ov.onclick=e=>{if(e.target===ov)close(null)};
     ov.querySelectorAll('.edit-score-btn').forEach(b=>{b.onclick=()=>{es=parseInt(b.dataset.sv);rmi(ov)}});const ci=ov.querySelector('.custom-score-input');ci.oninput=function(){const v=parseInt(this.value);if(!isNaN(v))es=v;rmi(ov)};ci.onkeydown=function(e){if(e.key==='Enter')e.preventDefault()};ov.querySelectorAll('.cat-chip').forEach(ch=>{ch.onclick=()=>{ec=ch.dataset.cat;rmi(ov)}});ov.querySelector('.edit-note').oninput=function(){en=this.value};ov.querySelector('.edit-reflection').oninput=function(){er=this.value};ov.querySelector('.date-input').onchange=function(){ed=this.value};}
     function rmi(ov){ov.querySelectorAll('.edit-score-btn').forEach(b=>b.classList.toggle('selected',parseInt(b.dataset.sv)===es));const ci=ov.querySelector('.custom-score-input');if(ci!==document.activeElement)ci.value=es;ov.querySelectorAll('.cat-chip').forEach(ch=>ch.classList.toggle('selected',ch.dataset.cat===ec))}
     rm();
@@ -506,14 +509,14 @@ function catStats(pid){const evts=data.events.filter(e=>e.personId===pid);if(evt
 // ═══ Render ═════════════════════
 function render(){renderTabBar();if(detailPersonId){renderDetail();showScreen('detail')}else{showScreen(currentTab);if(currentTab==='record')renderRecord();if(currentTab==='people')renderPeople();if(currentTab==='insights')renderInsights();if(currentTab==='settings')renderSettings()}updatePinBtn()}
 function showScreen(name){$$('.screen').forEach(s=>s.classList.remove('active'));const sc=$('#screen-'+name);if(sc)sc.classList.add('active');$('#tab-bar').style.display=(name==='detail')?'none':'flex';$('main').style.paddingBottom=(name==='detail')?'20px':'90px'}
-function renderTabBar(){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===currentTab))}
+function renderTabBar(){$$('.tab-btn').forEach(b=>{const active=b.dataset.tab===currentTab;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')})}
 function updatePinBtn(){$('#pin-setup-btn').style.display=data.settings.pin?'none':'block';$('#pin-remove-btn').style.display=data.settings.pin?'block':'none'}
 
 // ═══ Record ═════════════════════
 function renderRecord(){
   if(!$('#event-date').value)$('#event-date').value=todayStr();
   const ct=$('#person-list'),cats=getCats();
-  if(data.people.length===0){ct.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text"><b>第一步</b>：添加人物<br>在「设置」页添加你想记录的人</div><button class="btn-secondary" onclick="window._goSettings()" style="margin-top:10px;">去添加</button></div>`;$('#cat-chips').innerHTML='';$('#tmpl-chips').innerHTML=''}else{
+  if(data.people.length===0){ct.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text"><b>第一步</b>：添加人物<br>在「设置」页添加你想记录的人</div><button class="btn-secondary go-settings-btn" style="margin-top:10px;">去添加</button></div>`;$('#cat-chips').innerHTML='';$('#tmpl-chips').innerHTML='';const gsb=ct.querySelector('.go-settings-btn');if(gsb)gsb.onclick=()=>switchTab('settings')}else{
     ct.innerHTML=data.people.map(p=>{const sc=getScore(p.id);return`<div class="person-select-item${selectedPersonId===p.id?' selected':''}" data-pid="${p.id}"><div class="avatar-sm">${p.name[0]}</div><span class="item-name">${esc(p.name)}</span><span class="item-score ${scoreClass(sc)}">${scoreText(sc)}</span></div>`}).join('');
     ct.querySelectorAll('.person-select-item').forEach(el=>{el.onclick=()=>selectPerson(el.dataset.pid)});
     if(selectedPersonId){const sel=ct.querySelector('.person-select-item.selected');if(sel)sel.scrollIntoView({block:'nearest'})}
@@ -593,7 +596,7 @@ function renderInsights(){
       h+=`<div style="font-size:11px;color:var(--text3);margin-bottom:2px;">加分最多</div>`;
       tb.top.forEach(([pid,s])=>{const p=getPerson(pid);if(!p)return;h+=`<div style="display:flex;justify-content:space-between;padding:3px 4px;font-size:13px;"><span>${esc(p.name)}</span><span style="font-weight:600;color:${s>=0?'var(--positive)':'var(--negative)'};">${scoreText(s)}</span></div>`});
       h+=`<div style="font-size:11px;color:var(--text3);margin:6px 0 2px;">减分最多</div>`;
-      tb.bot.slice(0,3).forEach(([pid,s])=>{const p=getPerson(pid);if(!p||s>=0)return;h+=`<div style="display:flex;justify-content:space-between;padding:3px 4px;font-size:13px;"><span>${esc(p.name)}</span><span style="font-weight:600;color:var(--negative)';">${scoreText(s)}</span></div>`});
+      tb.bot.slice(0,3).forEach(([pid,s])=>{const p=getPerson(pid);if(!p||s>=0)return;h+=`<div style="display:flex;justify-content:space-between;padding:3px 4px;font-size:13px;"><span>${esc(p.name)}</span><span style="font-weight:600;color:var(--negative);">${scoreText(s)}</span></div>`});
       if(tb.bot.filter(([,s])=>s<0).length===0)h+=`<div style="color:var(--text3);font-size:12px;padding:3px 4px;">无扣分记录 🎉</div>`;
     }return h;
   }
@@ -605,7 +608,7 @@ function renderInsights(){
   // Compare
   const ppl=data.people,opt=ppl.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
   $('#compare-a').innerHTML=$('#compare-b').innerHTML=opt;if(ppl.length>=2){$('#compare-b').value=ppl[1].id}
-  function renderCompare(){const pa=getPerson($('#compare-a').value),pb=getPerson($('#compare-b').value);if(!pa||!pb){$('#compare-result').innerHTML='';return}
+  function renderCompare(){const aid=$('#compare-a').value,bid=$('#compare-b').value;if(aid===bid){$('#compare-result').innerHTML='<div style="text-align:center;color:var(--text2);font-size:13px;padding:16px;">请选择不同人物进行比较</div>';return}const pa=getPerson(aid),pb=getPerson(bid);if(!pa||!pb){$('#compare-result').innerHTML='';return}
     const sa=getScore(pa.id),sb=getScore(pb.id);let h=`<div class="compare-grid"><div class="compare-box"><div class="val ${scoreClass(sa)}">${scoreText(sa)}</div><div class="lbl">${esc(pa.name)}</div></div><div class="compare-box"><div class="val ${scoreClass(sb)}">${scoreText(sb)}</div><div class="lbl">${esc(pb.name)}</div></div></div>`;
     const allCats=new Set([...data.events.filter(e=>e.personId===pa.id||e.personId===pb.id).map(e=>e.category||'其他')]);
     allCats.forEach(c=>{const va=data.events.filter(e=>e.personId===pa.id&&(e.category||'其他')===c).reduce((s,e)=>s+e.score,0);const vb=data.events.filter(e=>e.personId===pb.id&&(e.category||'其他')===c).reduce((s,e)=>s+e.score,0);h+=`<div class="compare-cat-row"><span style="font-weight:600;color:${va>=0?'var(--positive)':'var(--negative)'};width:55px;">${scoreText(va)}</span><span style="color:var(--text2);flex:1;text-align:center;">${c}</span><span style="font-weight:600;color:${vb>=0?'var(--positive)':'var(--negative)'};width:55px;text-align:right;">${scoreText(vb)}</span></div>`});
@@ -653,9 +656,17 @@ function renderSettings(){
   if(daysSince>=7)$('#data-stats').innerHTML+=`<br>⚠️ 上次备份 ${daysSince} 天前，建议导出`;
 }
 
-function esc(s){const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};return s.replace(/[&<>"']/g,c=>m[c])}
+function esc(s){if(!s)return'';const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};return s.replace(/[&<>"']/g,c=>m[c])}
 
 // ═══ Export/Import ══════════════
+function save(){
+  _scoreCache=null;_eventsCache=null;
+  try{
+    const json=JSON.stringify({...data,settings:{...data.settings,pin:data.settings.pin}});
+    localStorage.setItem('ps_data',json);
+    try{localStorage.setItem('ps_data_bak',json)}catch(e){}
+  }catch(e){toast('保存失败，存储空间不足')}
+}
 function exportData(){
   const exp={people:data.people,events:data.events,settings:{theme:data.settings.theme,quickScore:data.settings.quickScore,categories:data.settings.categories,noteTemplates:data.settings.noteTemplates,groups:data.settings.groups,vibrate:data.settings.vibrate}};
   const b=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='人际记分备份_'+todayStr()+'.json';a.click();URL.revokeObjectURL(u);
@@ -665,8 +676,6 @@ function importData(){const inp=document.createElement('input');inp.type='file';
 async function resetAll(){const ok=await confirmDialog('清除全部数据？不可恢复！');if(!ok)return;data={people:[],events:[],settings:{pin:null,theme:data.settings.theme,quickScore:data.settings.quickScore,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:data.settings.vibrate}};selectedPersonId=null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('已清除')}
 async function setupPin(){if(data.settings.pin){const ok=await confirmDialog('已设置密码，修改？','修改','modal-primary');if(!ok)return}showPinScreen('setup')}
 async function removePin(){const ok=await confirmDialog('移除密码？');if(!ok)return;data.settings.pin=null;save();updatePinBtn();toast('密码已移除')}
-window._goSettings=()=>switchTab('settings');
-
 // ═══ Bind ═══════════════════════
 function bind(){
   $$('.tab-btn').forEach(b=>{b.onclick=()=>switchTab(b.dataset.tab)});$('.back-btn').onclick=goBack;$('#save-btn').onclick=handleSaveEvent;
@@ -687,7 +696,7 @@ function bind(){
   $('#add-group-btn').onclick=()=>{const v=$('#new-group-input').value.trim();if(!v)return;const gs=data.settings.groups;if(gs.includes(v)){toast('已存在');return}gs.push(v);save();toast('已添加');renderSettings()};
 }
 
-function init(){load();applyTheme();initPinScreen();if(data.people.length===1)selectedPersonId=data.people[0].id;if(data.settings.pin&&!unlocked){bind();showPinScreen('enter')}else{bind();render();if(_dataCorrupted)toast('数据已损坏，已重置为空')}
+function init(){load();applyTheme();initPinScreen();if(data.people.length===1)selectedPersonId=data.people[0].id;if(data.settings.pin&&!unlocked){bind();showPinScreen('enter')}else{bind();render();if(_dataCorrupted)setTimeout(()=>toast('数据损坏，已重置'),200)}
 }
 init();
 })();
