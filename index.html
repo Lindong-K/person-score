@@ -45,7 +45,6 @@ main {
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* Tab bar */
 #tab-bar {
   display: flex; background: var(--card); border-top: 1px solid var(--border);
   padding: 6px 0 var(--safe-bottom); position: fixed; bottom: 0; left: 0; right: 0;
@@ -59,20 +58,15 @@ main {
 .tab-btn.active { color: var(--primary); }
 .tab-icon { font-size: 22px; line-height: 1; }
 
-.screen-title {
-  font-size: 26px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.3px;
-}
+.screen-title { font-size: 26px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.3px; }
 
-/* Cards */
 .card {
   background: var(--card); border-radius: var(--radius); padding: 14px 16px;
   margin-bottom: 8px; box-shadow: var(--shadow); transition: background 0.3s, box-shadow 0.3s;
 }
 
-/* Person card */
 .person-card {
-  display: flex; align-items: center; gap: 12px; cursor: pointer;
-  transition: transform 0.1s, background 0.3s;
+  display: flex; align-items: center; gap: 12px; cursor: pointer; transition: transform 0.1s;
 }
 .person-card:active { transform: scale(0.98); }
 
@@ -84,15 +78,11 @@ main {
 
 .person-info { flex: 1; min-width: 0; }
 .person-name { font-size: 16px; font-weight: 600; }
-.person-last-event {
-  font-size: 12px; color: var(--secondary); margin-top: 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+.person-last-event { font-size: 12px; color: var(--secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .person-score { font-size: 22px; font-weight: 700; flex-shrink: 0; }
 .person-score.pos { color: var(--positive); }
 .person-score.neg { color: var(--negative); }
 
-/* Quick score buttons */
 .quick-btns { display: flex; gap: 6px; flex-shrink: 0; margin-left: 8px; }
 .quick-btn {
   width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
@@ -103,7 +93,6 @@ main {
 .quick-btn.minus { color: var(--negative); border-color: var(--negative); }
 .quick-btn:active { transform: scale(0.85); }
 
-/* Person selector */
 #person-list { margin-bottom: 4px; }
 .person-select-item {
   display: flex; align-items: center; gap: 10px; padding: 10px 14px;
@@ -122,37 +111,27 @@ main {
 .person-select-item .item-score.pos { color: var(--positive); }
 .person-select-item .item-score.neg { color: var(--negative); }
 
-/* Section */
-.section-label {
-  font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 8px; margin-top: 16px;
-}
+.section-label { font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 8px; margin-top: 16px; }
 .section-label:first-child { margin-top: 0; }
 
-/* Note textarea */
 .note-textarea {
   width: 100%; min-height: 56px; padding: 10px 14px; border: 1px solid var(--border);
   border-radius: var(--radius); font-size: 15px; font-family: inherit; resize: none;
   background: var(--card); color: var(--text); -webkit-appearance: none; line-height: 1.4;
-  transition: background 0.3s, color 0.3s, border-color 0.2s;
+  transition: background 0.3s, color 0.3s;
 }
 .note-textarea:focus { outline: none; border-color: var(--primary); }
 .note-textarea::placeholder { color: #c7c7cc; }
 
-/* Category chips */
-.cat-chips {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
-}
+.cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .cat-chip {
   padding: 6px 12px; border-radius: 16px; border: 1.5px solid var(--border);
   font-size: 13px; cursor: pointer; background: var(--card); color: var(--secondary);
   transition: all 0.12s; white-space: nowrap;
 }
 .cat-chip:active { transform: scale(0.95); }
-.cat-chip.selected {
-  border-color: var(--primary); background: var(--primary); color: #fff;
-}
+.cat-chip.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 
-/* Score presets */
 .preset-row { display: flex; gap: 6px; justify-content: center; }
 .preset-btn {
   flex: 1; max-width: 58px; height: 44px; border: 1.5px solid var(--border);
@@ -164,14 +143,10 @@ main {
 .preset-btn.neg { color: var(--negative); border-color: #fdd; }
 .preset-btn.selected.pos { background: var(--positive); color: #fff; border-color: var(--positive); }
 .preset-btn.selected.neg { background: var(--negative); color: #fff; border-color: var(--negative); }
-
 [data-theme="dark"] .preset-btn.pos { border-color: #1a4a1a; }
 [data-theme="dark"] .preset-btn.neg { border-color: #4a1a1a; }
 
-/* Custom score */
-.custom-score-row {
-  display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 4px;
-}
+.custom-score-row { display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 4px; }
 .custom-score-label { font-size: 13px; color: var(--secondary); }
 .custom-score-input {
   width: 80px; height: 40px; text-align: center; border: 1.5px solid var(--border);
@@ -180,7 +155,6 @@ main {
 }
 .custom-score-input:focus { outline: none; border-color: var(--primary); }
 
-/* Buttons */
 .btn-primary {
   width: 100%; height: 50px; background: var(--primary); color: #fff; border: none;
   border-radius: var(--radius); font-size: 17px; font-weight: 600; cursor: pointer;
@@ -192,7 +166,6 @@ main {
 .btn-secondary {
   padding: 8px 18px; background: var(--bg); border: 1px solid var(--border);
   border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text);
-  transition: background 0.3s, color 0.3s;
 }
 .btn-secondary:active { opacity: 0.7; }
 
@@ -216,9 +189,13 @@ main {
   background: #1c1c1e; color: #fff; padding: 10px 24px; border-radius: 20px;
   font-size: 14px; font-weight: 500; z-index: 1000;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  pointer-events: none;
+  pointer-events: auto; display: flex; align-items: center; gap: 10px;
 }
 #toast.show { transform: translateX(-50%) translateY(0); }
+#toast .undo-btn {
+  color: #FFD60A; background: none; border: none; font-size: 14px; font-weight: 600;
+  cursor: pointer; padding: 0; white-space: nowrap;
+}
 
 /* Modals */
 .modal-overlay {
@@ -230,20 +207,15 @@ main {
   background: var(--card); border-radius: 14px; padding: 24px 20px 20px;
   width: 310px; max-height: 90vh; overflow-y: auto; text-align: center;
   box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: scaleIn 0.2s;
-  transition: background 0.3s;
 }
 .modal-msg { font-size: 15px; margin-bottom: 20px; line-height: 1.5; text-align: center; }
 .modal-actions { display: flex; gap: 10px; }
-.modal-actions button {
-  flex: 1; height: 42px; border-radius: 10px; border: none;
-  font-size: 15px; font-weight: 500; cursor: pointer;
-}
+.modal-actions button { flex: 1; height: 42px; border-radius: 10px; border: none; font-size: 15px; font-weight: 500; cursor: pointer; }
 .modal-cancel { background: var(--bg); color: var(--text); }
 .modal-confirm { background: var(--negative); color: #fff; }
 .modal-primary { background: var(--primary); color: #fff; }
 .modal-cancel:active, .modal-confirm:active, .modal-primary:active { opacity: 0.8; }
 
-/* Edit modal specific */
 .edit-score-row { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
 .edit-score-btn {
   width: 44px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border);
@@ -258,14 +230,11 @@ main {
 .edit-note { margin: 8px 0; }
 .edit-label { font-size: 13px; color: var(--secondary); text-align: left; margin-bottom: 4px; }
 
-/* Detail screen */
-.detail-header {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
-}
+/* Detail */
+.detail-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .back-btn {
-  width: 36px; height: 36px; border: none; background: var(--card);
-  border-radius: 50%; font-size: 20px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border: none; background: var(--card); border-radius: 50%;
+  font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
   box-shadow: var(--shadow); flex-shrink: 0; color: var(--text);
 }
 .back-btn:active { background: var(--bg); }
@@ -274,15 +243,36 @@ main {
 .detail-total-score.pos { color: var(--positive); }
 .detail-total-score.neg { color: var(--negative); }
 
-/* Event card */
-.event-card {
-  display: flex; gap: 12px; align-items: flex-start; cursor: pointer;
+/* Trend chart */
+.chart-wrap {
+  background: var(--card); border-radius: var(--radius); padding: 12px 8px 8px;
+  margin-bottom: 8px; box-shadow: var(--shadow); transition: background 0.3s;
+  overflow: hidden;
 }
+.chart-wrap text { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+.chart-wrap .grid-line { stroke: var(--border); stroke-width: 0.5; stroke-dasharray: 4 3; }
+.chart-wrap .axis-line { stroke: var(--secondary); stroke-width: 1; }
+.chart-wrap .trend-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.chart-wrap .trend-dot { stroke: #fff; stroke-width: 2; }
+[data-theme="dark"] .chart-wrap .trend-dot { stroke: #2c2c2e; }
+
+/* Category stats */
+.cat-stats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.cat-stat-chip {
+  padding: 5px 10px; border-radius: 14px; font-size: 12px; font-weight: 500;
+  white-space: nowrap;
+}
+.cat-stat-chip.pos { background: #d4f5dd; color: #1a7a1a; }
+.cat-stat-chip.neg { background: #fdd; color: #a00; }
+[data-theme="dark"] .cat-stat-chip.pos { background: #1a3a1a; color: #32D74B; }
+[data-theme="dark"] .cat-stat-chip.neg { background: #3a1a1a; color: #FF453A; }
+
+/* Event */
+.event-card { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
 .event-card:active { opacity: 0.7; }
 .event-score {
-  width: 50px; height: 32px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+  width: 50px; height: 32px; border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
 }
 .event-score.pos { background: var(--positive); }
 .event-score.neg { background: var(--negative); }
@@ -300,19 +290,15 @@ main {
 }
 .event-del-btn:active { color: var(--negative); }
 
-/* Empty state */
-.empty-state {
-  text-align: center; padding: 40px 16px; color: var(--secondary);
-}
+.empty-state { text-align: center; padding: 40px 16px; color: var(--secondary); }
 .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-text { font-size: 15px; line-height: 1.5; }
 
-/* Settings */
 .input-row { display: flex; gap: 8px; }
 .text-input {
   flex: 1; height: 44px; padding: 0 14px; border: 1px solid var(--border);
   border-radius: var(--radius); font-size: 15px; -webkit-appearance: none;
-  background: var(--card); color: var(--text); transition: background 0.3s, color 0.3s;
+  background: var(--card); color: var(--text);
 }
 .text-input:focus { outline: none; border-color: var(--primary); }
 
@@ -323,25 +309,18 @@ main {
 .manage-person-name { font-size: 15px; font-weight: 500; }
 
 .settings-section { margin-top: 24px; }
-.settings-section-title {
-  font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 10px;
-}
-
+.settings-section-title { font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 10px; }
 .data-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .data-btn-row button { flex: 1; min-width: 100px; }
 
-/* Theme selector */
-.theme-row {
-  display: flex; gap: 6px; background: var(--bg); border-radius: 10px; padding: 4px;
-}
+.theme-row { display: flex; gap: 6px; background: var(--bg); border-radius: 10px; padding: 4px; }
 .theme-opt {
   flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px;
-  font-size: 13px; cursor: pointer; transition: all 0.2s; border: none;
-  background: transparent; color: var(--secondary);
+  font-size: 13px; cursor: pointer; border: none; background: transparent; color: var(--secondary);
 }
 .theme-opt.active { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--shadow); }
 
-/* PIN screen */
+/* PIN */
 #pin-screen {
   position: fixed; inset: 0; background: var(--bg); z-index: 1000;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -358,10 +337,7 @@ main {
 }
 .pin-dot.filled { background: var(--primary); border-color: var(--primary); }
 .pin-dot.shake { animation: shakeDots 0.4s ease; }
-
-.pin-pad {
-  display: grid; grid-template-columns: repeat(3, 70px); gap: 10px;
-}
+.pin-pad { display: grid; grid-template-columns: repeat(3, 70px); gap: 10px; }
 .pin-key {
   width: 70px; height: 56px; border-radius: 28px; border: 1px solid var(--border);
   background: var(--card); font-size: 24px; font-weight: 500; cursor: pointer;
@@ -371,15 +347,12 @@ main {
 .pin-key:active { background: var(--border); transform: scale(0.94); }
 .pin-key.empty { border: none; background: none; font-size: 16px; color: var(--secondary); }
 
-/* Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes shakeDots {
   0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-8px); }
-  40% { transform: translateX(8px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
+  20% { transform: translateX(-8px); } 40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); } 80% { transform: translateX(6px); }
 }
 
 @media (min-width: 480px) {
@@ -391,7 +364,6 @@ main {
 </head>
 <body>
 <div id="app">
-  <!-- PIN Screen -->
   <div id="pin-screen" class="hidden">
     <div class="pin-icon">🔐</div>
     <div class="pin-title" id="pin-title">输入密码</div>
@@ -404,7 +376,6 @@ main {
   </div>
 
   <main>
-    <!-- Record tab -->
     <div id="screen-record" class="screen active">
       <div class="screen-title">📝 记录事件</div>
       <div id="person-list"></div>
@@ -424,13 +395,11 @@ main {
       <button id="save-btn" class="btn-primary" disabled>保存记录</button>
     </div>
 
-    <!-- People tab -->
     <div id="screen-people" class="screen">
       <div class="screen-title">👥 人物列表</div>
       <div id="people-list"></div>
     </div>
 
-    <!-- Settings tab -->
     <div id="screen-settings" class="screen">
       <div class="screen-title">⚙️ 设置</div>
       <div class="section-label">添加人物</div>
@@ -465,13 +434,14 @@ main {
       </div>
     </div>
 
-    <!-- Detail screen -->
     <div id="screen-detail" class="screen">
       <div class="detail-header">
         <button class="back-btn">←</button>
         <span class="detail-person-name"></span>
         <span class="detail-total-score"></span>
       </div>
+      <div id="detail-chart"></div>
+      <div id="detail-cat-stats" class="cat-stats"></div>
       <div id="events-list"></div>
     </div>
   </main>
@@ -482,29 +452,24 @@ main {
     <button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span>设置</button>
   </nav>
 
-  <div id="toast"></div>
+  <div id="toast"><span id="toast-msg"></span></div>
 </div>
 
 <script>
 (function() {
   'use strict';
 
-  // ── Constants ──────────────────────────────────
   const CATEGORIES = ['守信','帮忙','靠谱','大方','失信','添乱','掉链子','小气','冷漠','其他'];
   const QUICK_SCORE = 5;
 
-  // ── State ──────────────────────────────────────
   let data = { people: [], events: [], settings: { pin: null, theme: 'auto' } };
   let currentTab = 'record';
   let detailPersonId = null;
   let selectedPersonId = null;
   let currentScore = null;
   let currentCategory = '其他';
-  // PIN
-  let pinMode = null; // 'enter' | 'setup' | 'confirm'
-  let pinEntry = '';
-  let pinFirst = '';
-  // Session
+  let lastEventId = null;
+  let pinMode = null, pinEntry = '', pinFirst = '';
   let unlocked = sessionStorage.getItem('ps_unlocked') === '1';
   let toastTimer = null;
 
@@ -521,7 +486,6 @@ main {
       document.documentElement.setAttribute('data-theme', t);
     }
   }
-
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (data.settings.theme === 'auto') applyTheme();
   });
@@ -536,68 +500,55 @@ main {
         if (!data.settings.theme) data.settings.theme = 'auto';
         if (data.settings.pin === undefined) data.settings.pin = null;
       }
-      // migrate events without category
       data.events.forEach(e => { if (!e.category) e.category = '其他'; });
     } catch(e) {
       data = { people: [], events: [], settings: { pin: null, theme: 'auto' } };
     }
   }
-
-  function save() {
-    localStorage.setItem('ps_data', JSON.stringify(data));
-  }
+  function save() { localStorage.setItem('ps_data', JSON.stringify(data)); }
 
   // ── Helpers ────────────────────────────────────
-  function uid() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  }
-
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function getPerson(id) { return data.people.find(p => p.id === id); }
-
-  function getScore(personId) {
-    return data.events.filter(e => e.personId === personId).reduce((sum, e) => sum + e.score, 0);
-  }
-
-  function getEvents(personId) {
-    return data.events.filter(e => e.personId === personId)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }
-
-  function getLastEvent(personId) {
-    const events = getEvents(personId);
-    return events.length > 0 ? events[0] : null;
-  }
-
+  function getScore(personId) { return data.events.filter(e => e.personId === personId).reduce((sum, e) => sum + e.score, 0); }
+  function getEvents(personId) { return data.events.filter(e => e.personId === personId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); }
+  function getLastEvent(personId) { const evts = getEvents(personId); return evts.length > 0 ? evts[0] : null; }
   function fmtDate(iso) {
-    const d = new Date(iso); const now = new Date();
-    const diff = now - d;
-    const mins = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
+    const d = new Date(iso), now = new Date(), diff = now - d;
+    const mins = Math.floor(diff / 60000), hours = Math.floor(diff / 3600000), days = Math.floor(diff / 86400000);
     if (mins < 1) return '刚刚';
     if (mins < 60) return mins + '分钟前';
     if (hours < 24) return hours + '小时前';
     if (days < 7) return days + '天前';
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
     if (y === now.getFullYear()) return m + '-' + day;
     return y + '-' + m + '-' + day;
   }
-
-  function scoreClass(n) {
-    if (n > 0) return 'pos'; if (n < 0) return 'neg'; return '';
-  }
-
+  function scoreClass(n) { return n > 0 ? 'pos' : n < 0 ? 'neg' : ''; }
   function scoreText(n) { return (n > 0 ? '+' : '') + n; }
 
   // ── Toast ──────────────────────────────────────
-  function toast(msg) {
+  function toast(msg, undoAction) {
     const el = $('#toast');
-    el.textContent = msg;
+    $('#toast-msg').textContent = msg;
+    const undoBtn = el.querySelector('.undo-btn');
+    if (undoBtn) undoBtn.remove();
+
+    if (undoAction) {
+      const btn = document.createElement('button');
+      btn.className = 'undo-btn';
+      btn.textContent = '撤销';
+      btn.onclick = () => { undoAction(); hideToast(); };
+      el.appendChild(btn);
+    }
+
     el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+    toastTimer = setTimeout(() => el.classList.remove('show'), undoAction ? 3000 : 2000);
+  }
+  function hideToast() {
+    $('#toast').classList.remove('show');
+    clearTimeout(toastTimer);
   }
 
   // ── Confirm modal ──────────────────────────────
@@ -605,14 +556,7 @@ main {
     return new Promise(resolve => {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
-      overlay.innerHTML = `
-        <div class="modal-box">
-          <div class="modal-msg">${msg}</div>
-          <div class="modal-actions">
-            <button class="modal-cancel">取消</button>
-            <button class="${confirmClass || 'modal-confirm'}">${confirmText || '确定'}</button>
-          </div>
-        </div>`;
+      overlay.innerHTML = `<div class="modal-box"><div class="modal-msg">${msg}</div><div class="modal-actions"><button class="modal-cancel">取消</button><button class="${confirmClass || 'modal-confirm'}">${confirmText || '确定'}</button></div></div>`;
       document.body.appendChild(overlay);
       overlay.querySelector('.modal-cancel').onclick = () => { overlay.remove(); resolve(false); };
       overlay.querySelector('.modal-actions button:last-child').onclick = () => { overlay.remove(); resolve(true); };
@@ -622,92 +566,53 @@ main {
 
   // ── PIN ────────────────────────────────────────
   function initPinScreen() {
-    // build keypad
     const pad = $('#pin-pad');
     const keys = [1,2,3,4,5,6,7,8,9,'清',0,'⌫'];
     pad.innerHTML = keys.map(k => {
       if (k === '清' || k === '⌫') return `<div class="pin-key empty" data-key="${k}">${k}</div>`;
       return `<div class="pin-key" data-key="${k}">${k}</div>`;
     }).join('');
-
     pad.onclick = (e) => {
       const key = e.target.dataset.key;
       if (!key) return;
       if (key === '清') { pinEntry = ''; updateDots(); return; }
       if (key === '⌫') { pinEntry = pinEntry.slice(0, -1); updateDots(); return; }
       if (pinEntry.length >= 4) return;
-      pinEntry += key;
-      updateDots();
-      if (pinEntry.length === 4) handlePinComplete();
+      pinEntry += key; updateDots();
+      if (pinEntry.length === 4) setTimeout(handlePinComplete, 150);
     };
   }
-
   function updateDots() {
     const dots = $$('#pin-dots .pin-dot');
     dots.forEach((d, i) => d.classList.toggle('filled', i < pinEntry.length));
     dots.forEach(d => d.classList.remove('shake'));
   }
-
   function showPinScreen(mode) {
-    pinMode = mode;
-    pinEntry = '';
-    updateDots();
+    pinMode = mode; pinEntry = ''; updateDots();
     $('#pin-screen').classList.remove('hidden');
     $('#pin-dots').classList.remove('shake');
-
-    if (mode === 'enter') {
-      $('#pin-title').textContent = '输入密码';
-      $('#pin-subtitle').textContent = '';
-    } else if (mode === 'setup') {
-      $('#pin-title').textContent = '设置密码';
-      $('#pin-subtitle').textContent = '输入 4 位数字密码';
-    } else if (mode === 'confirm') {
-      $('#pin-title').textContent = '确认密码';
-      $('#pin-subtitle').textContent = '再次输入以确认';
-    }
+    if (mode === 'enter') { $('#pin-title').textContent = '输入密码'; $('#pin-subtitle').textContent = ''; }
+    else if (mode === 'setup') { $('#pin-title').textContent = '设置密码'; $('#pin-subtitle').textContent = '输入 4 位数字密码'; }
+    else if (mode === 'confirm') { $('#pin-title').textContent = '确认密码'; $('#pin-subtitle').textContent = '再次输入以确认'; }
   }
-
-  function hidePinScreen() {
-    $('#pin-screen').classList.add('hidden');
-  }
-
+  function hidePinScreen() { $('#pin-screen').classList.add('hidden'); }
   function handlePinComplete() {
-    setTimeout(() => {
-      if (pinMode === 'enter') {
-        if (pinEntry === data.settings.pin) {
-          unlocked = true;
-          sessionStorage.setItem('ps_unlocked', '1');
-          hidePinScreen();
-          toast('欢迎回来');
-        } else {
-          shakeDots();
-          pinEntry = '';
-        }
-      } else if (pinMode === 'setup') {
-        pinFirst = pinEntry;
-        pinEntry = '';
-        showPinScreen('confirm');
-      } else if (pinMode === 'confirm') {
-        if (pinEntry === pinFirst) {
-          data.settings.pin = pinEntry;
-          unlocked = true;
-          sessionStorage.setItem('ps_unlocked', '1');
-          save();
-          hidePinScreen();
-          render();
-          toast('密码已设置');
-        } else {
-          shakeDots();
-          pinEntry = '';
-          pinFirst = '';
-          showPinScreen('setup');
-          $('#pin-subtitle').textContent = '两次输入不一致，请重新设置';
-        }
-      }
-      updateDots();
-    }, 150);
+    if (pinMode === 'enter') {
+      if (pinEntry === data.settings.pin) {
+        unlocked = true; sessionStorage.setItem('ps_unlocked', '1');
+        hidePinScreen(); toast('欢迎回来');
+      } else { shakeDots(); pinEntry = ''; }
+    } else if (pinMode === 'setup') {
+      pinFirst = pinEntry; pinEntry = ''; showPinScreen('confirm');
+    } else if (pinMode === 'confirm') {
+      if (pinEntry === pinFirst) {
+        data.settings.pin = pinEntry; unlocked = true;
+        sessionStorage.setItem('ps_unlocked', '1');
+        save(); hidePinScreen(); render(); toast('密码已设置');
+      } else { shakeDots(); pinEntry = ''; pinFirst = ''; showPinScreen('setup'); $('#pin-subtitle').textContent = '两次输入不一致，请重新设置'; }
+    }
+    updateDots();
   }
-
   function shakeDots() {
     const el = $('#pin-dots');
     el.classList.add('shake');
@@ -716,24 +621,13 @@ main {
 
   // ── Navigation ─────────────────────────────────
   function switchTab(tab) {
-    currentTab = tab;
-    detailPersonId = null;
+    currentTab = tab; detailPersonId = null;
     if (tab === 'record' && data.people.length === 1) selectedPersonId = data.people[0].id;
     if (tab !== 'record') selectedPersonId = null;
-    currentScore = null;
-    render();
+    currentScore = null; render();
   }
-
-  function showDetail(id) {
-    detailPersonId = id;
-    render();
-  }
-
-  function goBack() {
-    detailPersonId = null;
-    currentTab = 'people';
-    render();
-  }
+  function showDetail(id) { detailPersonId = id; render(); }
+  function goBack() { detailPersonId = null; currentTab = 'people'; render(); }
 
   // ── Data operations ────────────────────────────
   function addPerson(name) {
@@ -754,75 +648,62 @@ main {
     data.events = data.events.filter(e => e.personId !== id);
     if (selectedPersonId === id) selectedPersonId = data.people.length > 0 ? data.people[0].id : null;
     if (detailPersonId === id) goBack();
-    save(); render();
-    toast('已删除 ' + esc(person.name));
+    save(); render(); toast('已删除 ' + esc(person.name));
   }
 
   function addEvent(personId, score, note, category) {
-    data.events.push({
+    const ev = {
       id: uid(), personId, score,
       note: note || '（无备注）',
       category: category || '其他',
       createdAt: new Date().toISOString()
-    });
+    };
+    data.events.push(ev);
+    lastEventId = ev.id;
     save();
+    return ev;
+  }
+
+  function undoLastEvent() {
+    if (!lastEventId) return;
+    const idx = data.events.findIndex(e => e.id === lastEventId);
+    if (idx === -1) return;
+    const ev = data.events[idx];
+    data.events.splice(idx, 1);
+    lastEventId = null;
+    save();
+    if (detailPersonId === ev.personId) render();
+    else if (currentTab === 'people') renderPeopleTab();
   }
 
   function handleSaveEvent() {
     if (!selectedPersonId || currentScore === null || currentScore === 0) return;
-    addEvent(selectedPersonId, currentScore, $('#note-input').value.trim(), currentCategory);
+    const ev = addEvent(selectedPersonId, currentScore, $('#note-input').value.trim(), currentCategory);
     $('#note-input').value = '';
-    currentScore = null;
-    currentCategory = '其他';
+    currentScore = null; currentCategory = '其他';
     $('#custom-score').value = '';
     render();
-    toast('已记录 ' + scoreText(currentScore));
+    toast('已记录 ' + scoreText(ev.score), undoLastEvent);
   }
 
   function quickScore(personId, score) {
-    const cat = score > 0 ? '其他' : '其他';
-    const note = score > 0 ? '快捷加分' : '快捷减分';
-    data.events.push({
-      id: uid(), personId, score,
-      note, category: cat,
-      createdAt: new Date().toISOString()
-    });
-    save();
+    const ev = addEvent(personId, score, score > 0 ? '快捷加分' : '快捷减分', '其他');
     if (detailPersonId === personId) render();
     else renderPeopleTab();
-    toast(scoreText(score) + ' ' + esc(getPerson(personId).name));
+    toast(scoreText(score) + ' ' + esc(getPerson(personId).name), undoLastEvent);
   }
 
   async function deleteEvent(eventId) {
     const ok = await confirmDialog('确定要删除这条记录吗？');
     if (!ok) return;
     data.events = data.events.filter(e => e.id !== eventId);
-    save(); render();
-    toast('已删除');
+    save(); render(); toast('已删除');
   }
 
-  function selectPerson(id) {
-    selectedPersonId = id;
-    renderRecordForm();
-  }
-
-  function setScore(val) {
-    currentScore = val;
-    $('#custom-score').value = val;
-    renderScorePresets();
-    updateSaveBtn();
-  }
-
-  function setCustomScore(val) {
-    const n = parseInt(val);
-    currentScore = isNaN(n) ? null : n;
-    renderScorePresets();
-    updateSaveBtn();
-  }
-
-  function updateSaveBtn() {
-    $('#save-btn').disabled = !(selectedPersonId && currentScore !== null && currentScore !== 0);
-  }
+  function selectPerson(id) { selectedPersonId = id; renderRecordForm(); }
+  function setScore(val) { currentScore = val; $('#custom-score').value = val; renderScorePresets(); updateSaveBtn(); }
+  function setCustomScore(val) { const n = parseInt(val); currentScore = isNaN(n) ? null : n; renderScorePresets(); updateSaveBtn(); }
+  function updateSaveBtn() { $('#save-btn').disabled = !(selectedPersonId && currentScore !== null && currentScore !== 0); }
 
   // ── Edit modal ─────────────────────────────────
   function showEditModal(event) {
@@ -835,27 +716,22 @@ main {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
 
-      function renderEditModal() {
+      function renderModal() {
         overlay.innerHTML = `
           <div class="modal-box">
             <div style="font-size:17px;font-weight:700;margin-bottom:12px;">编辑记录</div>
             <div class="edit-label">评分</div>
-            <div class="edit-score-row">
-              ${presets.map(v => {
-                const cls = v > 0 ? 'pos' : 'neg';
-                const sel = editScore === v ? ' selected' : '';
-                return `<button class="edit-score-btn ${cls}${sel}" data-sv="${v}">${scoreText(v)}</button>`;
-              }).join('')}
-            </div>
+            <div class="edit-score-row">${presets.map(v => {
+              const cls = v > 0 ? 'pos' : 'neg';
+              return `<button class="edit-score-btn ${cls}${editScore === v ? ' selected' : ''}" data-sv="${v}">${scoreText(v)}</button>`;
+            }).join('')}</div>
             <div style="text-align:center;margin-bottom:8px;">
               <input type="number" class="custom-score-input" style="width:80px;" value="${editScore}" placeholder="自定义">
             </div>
             <div class="edit-label">分类</div>
-            <div class="cat-chips" style="justify-content:center;margin-bottom:8px;">
-              ${CATEGORIES.map(c =>
-                `<span class="cat-chip${editCat === c ? ' selected' : ''}" data-cat="${c}">${c}</span>`
-              ).join('')}
-            </div>
+            <div class="cat-chips" style="justify-content:center;margin-bottom:8px;">${CATEGORIES.map(c =>
+              `<span class="cat-chip${editCat === c ? ' selected' : ''}" data-cat="${c}">${c}</span>`
+            ).join('')}</div>
             <div class="edit-label">备注</div>
             <textarea class="note-textarea edit-note" style="min-height:52px;">${esc(editNote)}</textarea>
             <div class="modal-actions" style="margin-top:14px;">
@@ -863,64 +739,36 @@ main {
               <button class="modal-primary">保存</button>
             </div>
           </div>`;
-
         document.body.appendChild(overlay);
 
-        // Bind handlers
         overlay.querySelector('.modal-cancel').onclick = () => { overlay.remove(); resolve(null); };
-        overlay.querySelector('.modal-primary').onclick = () => {
-          overlay.remove();
-          resolve({ score: editScore, note: editNote, category: editCat });
-        };
+        overlay.querySelector('.modal-primary').onclick = () => { overlay.remove(); resolve({ score: editScore, note: editNote, category: editCat }); };
         overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(null); } };
 
-        // Score preset buttons
         overlay.querySelectorAll('.edit-score-btn').forEach(b => {
-          b.onclick = () => {
-            editScore = parseInt(b.dataset.sv);
-            renderEditModalInner();
-          };
+          b.onclick = () => { editScore = parseInt(b.dataset.sv); renderModalInner(overlay); };
         });
-
-        // Custom score input
         const ci = overlay.querySelector('.custom-score-input');
-        ci.oninput = function() {
-          const v = parseInt(this.value);
-          if (!isNaN(v)) editScore = v;
-          renderEditModalInner();
-        };
+        ci.oninput = function() { const v = parseInt(this.value); if (!isNaN(v)) editScore = v; renderModalInner(overlay); };
         ci.onkeydown = function(e) { if (e.key === 'Enter') e.preventDefault(); };
-
-        // Category chips
         overlay.querySelectorAll('.cat-chip').forEach(chip => {
-          chip.onclick = () => {
-            editCat = chip.dataset.cat;
-            renderEditModalInner();
-          };
+          chip.onclick = () => { editCat = chip.dataset.cat; renderModalInner(overlay); };
         });
-
-        // Note
-        overlay.querySelector('.edit-note').oninput = function() {
-          editNote = this.value;
-        };
+        overlay.querySelector('.edit-note').oninput = function() { editNote = this.value; };
       }
 
-      function renderEditModalInner() {
-        // Update score buttons
-        overlay.querySelectorAll('.edit-score-btn').forEach(b => {
-          const v = parseInt(b.dataset.sv);
-          b.classList.toggle('selected', editScore === v);
+      function renderModalInner(ov) {
+        ov.querySelectorAll('.edit-score-btn').forEach(b => {
+          b.classList.toggle('selected', parseInt(b.dataset.sv) === editScore);
         });
-        // Update custom input
-        const ci = overlay.querySelector('.custom-score-input');
+        const ci = ov.querySelector('.custom-score-input');
         if (ci !== document.activeElement) ci.value = editScore;
-        // Update category chips
-        overlay.querySelectorAll('.cat-chip').forEach(chip => {
+        ov.querySelectorAll('.cat-chip').forEach(chip => {
           chip.classList.toggle('selected', chip.dataset.cat === editCat);
         });
       }
 
-      renderEditModal();
+      renderModal();
     });
   }
 
@@ -932,9 +780,89 @@ main {
     ev.score = result.score;
     ev.note = result.note || '（无备注）';
     ev.category = result.category;
-    save();
-    render();
-    toast('已更新');
+    save(); render(); toast('已更新');
+  }
+
+  // ── Trend chart ────────────────────────────────
+  function renderTrendChart(personId) {
+    const events = data.events.filter(e => e.personId === personId)
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    if (events.length < 2) return '';
+
+    let cum = 0;
+    const pts = events.map(e => { cum += e.score; return { cum, score: e.score, date: e.createdAt }; });
+
+    const cumVals = pts.map(p => p.cum);
+    const minC = Math.min(0, ...cumVals);
+    const maxC = Math.max(0, ...cumVals);
+    const range = maxC - minC || 1;
+
+    const W = 340, H = 170;
+    const pad = { t: 18, r: 12, b: 28, l: 44 };
+    const pW = W - pad.l - pad.r, pH = H - pad.t - pad.b;
+
+    const n = pts.length;
+    pts.forEach((p, i) => {
+      p.x = pad.l + (i / Math.max(n - 1, 1)) * pW;
+      p.y = pad.t + ((maxC - p.cum) / range) * pH;
+    });
+
+    // nice step for Y grid
+    const step = range <= 10 ? 5 : range <= 50 ? 10 : range <= 100 ? 20 : range <= 200 ? 50 : 100;
+    const gridStart = Math.floor(minC / step) * step;
+    const gridEnd = Math.ceil(maxC / step) * step;
+
+    let gridLines = '';
+    let yLabels = '';
+    for (let v = gridStart; v <= gridEnd; v += step) {
+      const y = pad.t + ((maxC - v) / range) * pH;
+      gridLines += `<line class="grid-line" x1="${pad.l}" y1="${y.toFixed(1)}" x2="${pad.l + pW}" y2="${y.toFixed(1)}"/>`;
+      yLabels += `<text x="${pad.l - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--secondary)">${v >= 0 ? '+' + v : v}</text>`;
+    }
+
+    // X labels
+    let xLabels = '';
+    const labelIndices = n <= 4 ? [0, n - 1] : [0, Math.floor(n / 3), Math.floor(2 * n / 3), n - 1];
+    labelIndices.forEach(idx => {
+      xLabels += `<text x="${pts[idx].x.toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--secondary)">${fmtDate(pts[idx].date)}</text>`;
+    });
+
+    const pathD = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const lineColor = cumVals[n - 1] >= 0 ? 'var(--positive)' : 'var(--negative)';
+
+    const dots = pts.map(p => {
+      const dc = p.score >= 0 ? 'var(--positive)' : 'var(--negative)';
+      return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" class="trend-dot" fill="${dc}"/>`;
+    }).join('');
+
+    return `<div class="chart-wrap">
+      <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;">
+        ${gridLines}${yLabels}
+        <line class="axis-line" x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t + pH}"/>
+        <line class="axis-line" x1="${pad.l}" y1="${pad.t + pH}" x2="${pad.l + pW}" y2="${pad.t + pH}"/>
+        <path class="trend-line" d="${pathD}" stroke="${lineColor}"/>
+        ${dots}
+        ${xLabels}
+      </svg>
+    </div>`;
+  }
+
+  // ── Category stats ─────────────────────────────
+  function renderCatStats(personId) {
+    const events = data.events.filter(e => e.personId === personId);
+    if (events.length === 0) return '';
+
+    const map = {};
+    events.forEach(e => {
+      const cat = e.category || '其他';
+      map[cat] = (map[cat] || 0) + e.score;
+    });
+
+    const entries = Object.entries(map).sort((a, b) => b[1] - a[1]);
+    return entries.map(([cat, sc]) => {
+      const cls = sc >= 0 ? 'pos' : 'neg';
+      return `<span class="cat-stat-chip ${cls}">${cat} ${scoreText(sc)}</span>`;
+    }).join('');
   }
 
   // ── Render ─────────────────────────────────────
@@ -969,42 +897,25 @@ main {
     $('#pin-remove-btn').style.display = data.settings.pin ? 'block' : 'none';
   }
 
-  // ── Record tab ─────────────────────────────────
+  // ── Record form ────────────────────────────────
   function renderRecordForm() {
     const container = $('#person-list');
     if (data.people.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <div class="empty-text">还没有添加任何人<br>请先在「设置」中添加</div>
-          <button class="btn-secondary mt-16" onclick="window._goSettings()">去添加</button>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">还没有添加任何人<br>请先在「设置」中添加</div><button class="btn-secondary mt-16" onclick="window._goSettings()">去添加</button></div>`;
       $('#cat-chips').innerHTML = '';
     } else {
       container.innerHTML = data.people.map(p => {
-        const sc = getScore(p.id);
-        const cls = selectedPersonId === p.id ? ' selected' : '';
-        const scls = scoreClass(sc);
-        return `
-          <div class="person-select-item${cls}" data-pid="${p.id}">
-            <div class="avatar-sm">${p.name[0]}</div>
-            <span class="item-name">${esc(p.name)}</span>
-            <span class="item-score ${scls}">${scoreText(sc)}</span>
-          </div>`;
+        const sc = getScore(p.id), cls = selectedPersonId === p.id ? ' selected' : '';
+        return `<div class="person-select-item${cls}" data-pid="${p.id}"><div class="avatar-sm">${p.name[0]}</div><span class="item-name">${esc(p.name)}</span><span class="item-score ${scoreClass(sc)}">${scoreText(sc)}</span></div>`;
       }).join('');
       container.querySelectorAll('.person-select-item').forEach(el => {
         el.onclick = () => selectPerson(el.dataset.pid);
       });
-
-      // category chips
       $('#cat-chips').innerHTML = CATEGORIES.map(c =>
         `<span class="cat-chip${currentCategory === c ? ' selected' : ''}" data-cat="${c}">${c}</span>`
       ).join('');
       $('#cat-chips').querySelectorAll('.cat-chip').forEach(chip => {
-        chip.onclick = () => {
-          currentCategory = chip.dataset.cat;
-          renderRecordForm();
-        };
+        chip.onclick = () => { currentCategory = chip.dataset.cat; renderRecordForm(); };
       });
     }
     renderScorePresets();
@@ -1014,21 +925,15 @@ main {
   function renderScorePresets() {
     const negPresets = [-20, -10, -5, -3, -1];
     const posPresets = [1, 3, 5, 10, 20];
-
     $('#neg-presets').innerHTML = negPresets.map(v => {
       const sel = currentScore === v ? ' selected' : '';
       return `<button class="preset-btn neg${sel}" data-score="${v}">${v}</button>`;
     }).join('');
-
     $('#pos-presets').innerHTML = posPresets.map(v => {
       const sel = currentScore === v ? ' selected' : '';
       return `<button class="preset-btn pos${sel}" data-score="${v}">+${v}</button>`;
     }).join('');
-
-    $$('.preset-btn').forEach(b => {
-      b.onclick = () => setScore(parseInt(b.dataset.score));
-    });
-
+    $$('.preset-btn').forEach(b => { b.onclick = () => setScore(parseInt(b.dataset.score)); });
     if (currentScore !== null) $('#custom-score').value = currentScore;
   }
 
@@ -1036,48 +941,28 @@ main {
   function renderPeopleTab() {
     const container = $('#people-list');
     if (data.people.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">👤</div>
-          <div class="empty-text">还没有添加任何人<br>去「设置」添加你的第一个人物吧</div>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">还没有添加任何人<br>去「设置」添加你的第一个人物吧</div></div>`;
       return;
     }
-
     const sorted = [...data.people].sort((a, b) => getScore(b.id) - getScore(a.id));
-
     container.innerHTML = sorted.map(p => {
-      const sc = getScore(p.id); const scls = scoreClass(sc);
+      const sc = getScore(p.id), scls = scoreClass(sc);
       const last = getLastEvent(p.id);
-      const preview = last ? last.note : '暂无记录';
-      return `
-        <div class="card person-card" data-pid="${p.id}">
-          <div class="avatar">${p.name[0]}</div>
-          <div class="person-info">
-            <div class="person-name">${esc(p.name)}</div>
-            <div class="person-last-event">${esc(preview)}</div>
-          </div>
-          <span class="person-score ${scls}">${scoreText(sc)}</span>
-          <div class="quick-btns">
-            <button class="quick-btn plus" data-pid="${p.id}" data-q="1">+</button>
-            <button class="quick-btn minus" data-pid="${p.id}" data-q="-1">−</button>
-          </div>
-        </div>`;
+      return `<div class="card person-card" data-pid="${p.id}">
+        <div class="avatar">${p.name[0]}</div>
+        <div class="person-info"><div class="person-name">${esc(p.name)}</div><div class="person-last-event">${esc(last ? last.note : '暂无记录')}</div></div>
+        <span class="person-score ${scls}">${scoreText(sc)}</span>
+        <div class="quick-btns">
+          <button class="quick-btn plus" data-pid="${p.id}" data-q="1">+</button>
+          <button class="quick-btn minus" data-pid="${p.id}" data-q="-1">−</button>
+        </div>
+      </div>`;
     }).join('');
-
     container.querySelectorAll('.person-card').forEach(el => {
-      el.onclick = (e) => {
-        if (e.target.closest('.quick-btn')) return;
-        showDetail(el.dataset.pid);
-      };
+      el.onclick = (e) => { if (e.target.closest('.quick-btn')) return; showDetail(el.dataset.pid); };
     });
-
     container.querySelectorAll('.quick-btn').forEach(b => {
-      b.onclick = (e) => {
-        e.stopPropagation();
-        const sign = parseInt(b.dataset.q);
-        quickScore(b.dataset.pid, sign * QUICK_SCORE);
-      };
+      b.onclick = (e) => { e.stopPropagation(); quickScore(b.dataset.pid, parseInt(b.dataset.q) * QUICK_SCORE); };
     });
   }
 
@@ -1087,37 +972,31 @@ main {
     if (!person) { goBack(); return; }
 
     const sc = getScore(detailPersonId);
-    const scls = scoreClass(sc);
-
     $('.detail-person-name').textContent = person.name;
     $('.detail-total-score').textContent = scoreText(sc);
-    $('.detail-total-score').className = 'detail-total-score ' + scls;
+    $('.detail-total-score').className = 'detail-total-score ' + scoreClass(sc);
+
+    $('#detail-chart').innerHTML = renderTrendChart(detailPersonId);
+    $('#detail-cat-stats').innerHTML = renderCatStats(detailPersonId);
 
     const events = getEvents(detailPersonId);
     const container = $('#events-list');
 
     if (events.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">📭</div>
-          <div class="empty-text">还没有任何记录</div>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">还没有任何记录</div></div>`;
     } else {
-      container.innerHTML = events.map(e => {
-        const scls2 = scoreClass(e.score);
-        return `
-          <div class="card event-card" data-eid="${e.id}">
-            <div class="event-score ${scls2}">${scoreText(e.score)}</div>
-            <div class="event-body">
-              <div class="event-note">${esc(e.note)}</div>
-              <div class="event-meta">
-                <span class="event-cat-badge">${esc(e.category || '其他')}</span>
-                <span class="event-date">${fmtDate(e.createdAt)}</span>
-              </div>
+      container.innerHTML = events.map(e => `
+        <div class="card event-card" data-eid="${e.id}">
+          <div class="event-score ${scoreClass(e.score)}">${scoreText(e.score)}</div>
+          <div class="event-body">
+            <div class="event-note">${esc(e.note)}</div>
+            <div class="event-meta">
+              <span class="event-cat-badge">${esc(e.category || '其他')}</span>
+              <span class="event-date">${fmtDate(e.createdAt)}</span>
             </div>
-            <button class="event-del-btn" data-eid="${e.id}">✕</button>
-          </div>`;
-      }).join('');
+          </div>
+          <button class="event-del-btn" data-eid="${e.id}">✕</button>
+        </div>`).join('');
     }
 
     container.querySelectorAll('.event-card').forEach(card => {
@@ -1126,36 +1005,23 @@ main {
         editEvent(card.dataset.eid);
       };
     });
-
     container.querySelectorAll('.event-del-btn').forEach(b => {
-      b.onclick = (e) => {
-        e.stopPropagation();
-        deleteEvent(b.dataset.eid);
-      };
+      b.onclick = (e) => { e.stopPropagation(); deleteEvent(b.dataset.eid); };
     });
   }
 
-  // ── Settings tab ───────────────────────────────
+  // ── Settings ───────────────────────────────────
   function renderSettingsTab() {
     const list = $('#manage-people-list');
     if (data.people.length === 0) {
       list.innerHTML = '<div style="color:var(--secondary);font-size:14px;padding:8px 0;">暂无人物</div>';
     } else {
       list.innerHTML = data.people.map(p => `
-        <div class="manage-person-row">
-          <span class="manage-person-name">${esc(p.name)}</span>
-          <button class="btn-danger" data-pid="${p.id}">删除</button>
-        </div>`).join('');
-      list.querySelectorAll('.btn-danger').forEach(b => {
-        b.onclick = () => deletePerson(b.dataset.pid);
-      });
+        <div class="manage-person-row"><span class="manage-person-name">${esc(p.name)}</span><button class="btn-danger" data-pid="${p.id}">删除</button></div>`).join('');
+      list.querySelectorAll('.btn-danger').forEach(b => { b.onclick = () => deletePerson(b.dataset.pid); });
     }
-
-    // Theme selector
-    const currentTheme = data.settings.theme;
-    $$('#theme-selector .theme-opt').forEach(opt => {
-      opt.classList.toggle('active', opt.dataset.theme === currentTheme);
-    });
+    const ct = data.settings.theme;
+    $$('#theme-selector .theme-opt').forEach(opt => { opt.classList.toggle('active', opt.dataset.theme === ct); });
   }
 
   function esc(s) {
@@ -1163,17 +1029,14 @@ main {
     return s.replace(/[&<>"']/g, c => map[c]);
   }
 
-  // ── Export / Import ────────────────────────────
+  // ── Export/Import ──────────────────────────────
   function exportData() {
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = '人际记分备份_' + new Date().toISOString().slice(0, 10) + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('已导出');
+    a.href = url; a.download = '人际记分备份_' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click(); URL.revokeObjectURL(url); toast('已导出');
   }
 
   function importData() {
@@ -1185,10 +1048,8 @@ main {
       try {
         const text = await file.text();
         const imported = JSON.parse(text);
-        if (!imported.people || !imported.events) throw new Error('Invalid format');
-        const ok = await confirmDialog(
-          '导入将覆盖当前所有数据（人物 ' + imported.people.length + ' 个，记录 ' + imported.events.length + ' 条），确定继续？'
-        );
+        if (!imported.people || !imported.events) throw new Error('Invalid');
+        const ok = await confirmDialog('导入将覆盖当前所有数据（人物 ' + imported.people.length + ' 个，记录 ' + imported.events.length + ' 条），确定继续？');
         if (!ok) return;
         data = imported;
         if (!data.settings) data.settings = { pin: null, theme: 'auto' };
@@ -1197,9 +1058,7 @@ main {
         data.events.forEach(e => { if (!e.category) e.category = '其他'; });
         selectedPersonId = data.people.length > 0 ? data.people[0].id : null;
         currentScore = null; detailPersonId = null;
-        applyTheme();
-        save(); render();
-        toast('导入成功');
+        applyTheme(); save(); render(); toast('导入成功');
       } catch(e) { toast('文件格式错误'); }
     };
     input.click();
@@ -1210,11 +1069,9 @@ main {
     if (!ok) return;
     data = { people: [], events: [], settings: { pin: null, theme: 'auto' } };
     selectedPersonId = null; currentScore = null; detailPersonId = null;
-    applyTheme(); save(); render();
-    toast('已清除全部数据');
+    applyTheme(); save(); render(); toast('已清除全部数据');
   }
 
-  // ── PIN Setup ──────────────────────────────────
   async function setupPin() {
     if (data.settings.pin) {
       const ok = await confirmDialog('已设置密码，要修改吗？', '修改', 'modal-primary');
@@ -1226,83 +1083,42 @@ main {
   async function removePin() {
     const ok = await confirmDialog('确定要移除密码吗？');
     if (!ok) return;
-    data.settings.pin = null;
-    save();
-    updatePinButton();
-    toast('密码已移除');
+    data.settings.pin = null; save(); updatePinButton(); toast('密码已移除');
   }
 
-  // ── Global helpers ─────────────────────────────
   window._goSettings = () => switchTab('settings');
 
-  // ── Event bindings ─────────────────────────────
+  // ── Bind ───────────────────────────────────────
   function bind() {
-    $$('.tab-btn').forEach(b => {
-      b.onclick = () => switchTab(b.dataset.tab);
-    });
-
+    $$('.tab-btn').forEach(b => { b.onclick = () => switchTab(b.dataset.tab); });
     $('.back-btn').onclick = goBack;
     $('#save-btn').onclick = handleSaveEvent;
-
     $('#custom-score').oninput = function() {
-      if (this.value === '' || this.value === '-') {
-        currentScore = null; updateSaveBtn(); renderScorePresets(); return;
-      }
+      if (this.value === '' || this.value === '-') { currentScore = null; updateSaveBtn(); renderScorePresets(); return; }
       setCustomScore(this.value);
     };
-
-    $('#note-input').onkeydown = function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); $('#custom-score').focus(); }
-    };
-
-    // Settings
-    $('#add-person-btn').onclick = () => {
-      addPerson($('#new-person-input').value);
-      $('#new-person-input').value = '';
-    };
-    $('#new-person-input').onkeydown = function(e) {
-      if (e.key === 'Enter') { addPerson(this.value); this.value = ''; }
-    };
+    $('#note-input').onkeydown = function(e) { if (e.key === 'Enter') { e.preventDefault(); $('#custom-score').focus(); } };
+    $('#add-person-btn').onclick = () => { addPerson($('#new-person-input').value); $('#new-person-input').value = ''; };
+    $('#new-person-input').onkeydown = function(e) { if (e.key === 'Enter') { addPerson(this.value); this.value = ''; } };
     $('#export-btn').onclick = exportData;
     $('#import-btn').onclick = importData;
     $('#reset-btn').onclick = resetAll;
-
-    // Theme
     $$('#theme-selector .theme-opt').forEach(opt => {
-      opt.onclick = () => {
-        data.settings.theme = opt.dataset.theme;
-        applyTheme();
-        save();
-        renderSettingsTab();
-      };
+      opt.onclick = () => { data.settings.theme = opt.dataset.theme; applyTheme(); save(); renderSettingsTab(); };
     });
-
-    // PIN
     $('#pin-setup-btn').onclick = setupPin;
     $('#pin-remove-btn').onclick = removePin;
   }
 
   // ── Init ───────────────────────────────────────
   function init() {
-    load();
-    applyTheme();
-    initPinScreen();
-
+    load(); applyTheme(); initPinScreen();
     if (data.people.length === 1) selectedPersonId = data.people[0].id;
-
-    if (data.settings.pin && !unlocked) {
-      // Need PIN first
-      bind();
-      showPinScreen('enter');
-    } else {
-      bind();
-      render();
-    }
+    if (data.settings.pin && !unlocked) { bind(); showPinScreen('enter'); }
+    else { bind(); render(); }
   }
-
   init();
 })();
 </script>
-<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/person-score/sw.js");}</script>
 </body>
 </html>
