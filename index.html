@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="auto">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,47 +10,35 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #f2f2f7;
-  --card: #ffffff;
-  --primary: #007AFF;
-  --positive: #34C759;
-  --negative: #FF3B30;
-  --text: #1c1c1e;
-  --secondary: #8e8e93;
-  --border: #e5e5ea;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --radius: 12px;
-  --safe-bottom: env(safe-area-inset-bottom, 8px);
+  --bg: #f2f2f7; --card: #ffffff; --primary: #007AFF; --positive: #34C759;
+  --negative: #FF3B30; --text: #1c1c1e; --secondary: #8e8e93; --border: #e5e5ea;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08); --radius: 12px;
+  --avatar-bg: #e8f0fe; --safe-bottom: env(safe-area-inset-bottom, 8px);
+  --modal-overlay: rgba(0,0,0,0.4);
+}
+[data-theme="dark"] {
+  --bg: #1c1c1e; --card: #2c2c2e; --primary: #0A84FF; --positive: #32D74B;
+  --negative: #FF453A; --text: #e5e5ea; --secondary: #98989d; --border: #3a3a3c;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4); --avatar-bg: #1a3a5c;
+  --modal-overlay: rgba(0,0,0,0.7);
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
+  background: var(--bg); color: var(--text);
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  user-select: none; height: 100vh; height: 100dvh; overflow: hidden;
+  transition: background 0.3s, color 0.3s;
 }
 
 #app {
-  max-width: 480px;
-  margin: 0 auto;
-  height: 100vh;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  max-width: 480px; margin: 0 auto; height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column; position: relative;
 }
 
 main {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px 16px;
-  padding-bottom: 90px;
-  -webkit-overflow-scrolling: touch;
+  flex: 1; overflow-y: auto; padding: 20px 16px; padding-bottom: 90px;
+  -webkit-overflow-scrolling: touch; transition: background 0.3s;
 }
 
 .screen { display: none; }
@@ -58,118 +46,75 @@ main {
 
 /* Tab bar */
 #tab-bar {
-  display: flex;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  padding: 6px 0 var(--safe-bottom);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-width: 480px;
-  margin: 0 auto;
-  z-index: 100;
+  display: flex; background: var(--card); border-top: 1px solid var(--border);
+  padding: 6px 0 var(--safe-bottom); position: fixed; bottom: 0; left: 0; right: 0;
+  max-width: 480px; margin: 0 auto; z-index: 100; transition: background 0.3s;
 }
-
 .tab-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  border: none;
-  background: none;
-  color: var(--secondary);
-  font-size: 10px;
-  padding: 4px 0;
-  cursor: pointer;
-  transition: color 0.15s;
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border: none; background: none; color: var(--secondary); font-size: 10px;
+  padding: 4px 0; cursor: pointer; transition: color 0.15s;
 }
-
 .tab-btn.active { color: var(--primary); }
 .tab-icon { font-size: 22px; line-height: 1; }
 
-/* Header */
 .screen-title {
-  font-size: 26px;
-  font-weight: 800;
-  margin-bottom: 16px;
-  letter-spacing: -0.3px;
+  font-size: 26px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.3px;
 }
 
 /* Cards */
 .card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 8px;
-  box-shadow: var(--shadow);
+  background: var(--card); border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 8px; box-shadow: var(--shadow); transition: background 0.3s, box-shadow 0.3s;
 }
 
 /* Person card */
 .person-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: transform 0.1s;
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  transition: transform 0.1s, background 0.3s;
 }
 .person-card:active { transform: scale(0.98); }
 
 .avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: #e8f0fe;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  flex-shrink: 0;
+  width: 46px; height: 46px; border-radius: 50%; background: var(--avatar-bg);
+  color: var(--primary); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; flex-shrink: 0; transition: background 0.3s;
 }
 
 .person-info { flex: 1; min-width: 0; }
 .person-name { font-size: 16px; font-weight: 600; }
 .person-last-event {
-  font-size: 12px;
-  color: var(--secondary);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 12px; color: var(--secondary); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
 .person-score { font-size: 22px; font-weight: 700; flex-shrink: 0; }
 .person-score.pos { color: var(--positive); }
 .person-score.neg { color: var(--negative); }
 
-/* Person selector in record */
-#person-list { margin-bottom: 4px; }
+/* Quick score buttons */
+.quick-btns { display: flex; gap: 6px; flex-shrink: 0; margin-left: 8px; }
+.quick-btn {
+  width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
+  font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; background: var(--card); transition: all 0.12s;
+}
+.quick-btn.plus { color: var(--positive); border-color: var(--positive); }
+.quick-btn.minus { color: var(--negative); border-color: var(--negative); }
+.quick-btn:active { transform: scale(0.85); }
 
+/* Person selector */
+#person-list { margin-bottom: 4px; }
 .person-select-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all 0.15s;
-  background: var(--card);
-  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer;
+  transition: all 0.15s; background: var(--card); margin-bottom: 6px;
 }
 .person-select-item:active { transform: scale(0.98); }
-.person-select-item.selected {
-  border-color: var(--primary);
-  background: #e8f0fe;
-}
+.person-select-item.selected { border-color: var(--primary); background: var(--avatar-bg); }
 .person-select-item .avatar-sm {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: #e8f0fe; color: var(--primary);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 50%; background: var(--avatar-bg);
+  color: var(--primary); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0; transition: background 0.3s;
 }
 .person-select-item .item-name { font-size: 15px; font-weight: 500; flex: 1; }
 .person-select-item .item-score { font-size: 14px; font-weight: 600; }
@@ -178,211 +123,149 @@ main {
 
 /* Section */
 .section-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--secondary);
-  margin-bottom: 8px;
-  margin-top: 16px;
+  font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 8px; margin-top: 16px;
 }
 .section-label:first-child { margin-top: 0; }
 
-/* Textarea */
+/* Note textarea */
 .note-textarea {
-  width: 100%;
-  min-height: 68px;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 15px;
-  font-family: inherit;
-  resize: none;
-  background: var(--card);
-  color: var(--text);
-  -webkit-appearance: none;
-  line-height: 1.4;
+  width: 100%; min-height: 56px; padding: 10px 14px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 15px; font-family: inherit; resize: none;
+  background: var(--card); color: var(--text); -webkit-appearance: none; line-height: 1.4;
+  transition: background 0.3s, color 0.3s, border-color 0.2s;
 }
 .note-textarea:focus { outline: none; border-color: var(--primary); }
 .note-textarea::placeholder { color: #c7c7cc; }
 
-/* Score presets */
-.preset-row {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
+/* Category chips */
+.cat-chips {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+}
+.cat-chip {
+  padding: 6px 12px; border-radius: 16px; border: 1.5px solid var(--border);
+  font-size: 13px; cursor: pointer; background: var(--card); color: var(--secondary);
+  transition: all 0.12s; white-space: nowrap;
+}
+.cat-chip:active { transform: scale(0.95); }
+.cat-chip.selected {
+  border-color: var(--primary); background: var(--primary); color: #fff;
 }
 
+/* Score presets */
+.preset-row { display: flex; gap: 6px; justify-content: center; }
 .preset-btn {
-  flex: 1;
-  max-width: 58px;
-  height: 44px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.12s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1; max-width: 58px; height: 44px; border: 1.5px solid var(--border);
+  border-radius: 10px; background: var(--card); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: center;
 }
 .preset-btn:active { transform: scale(0.93); }
 .preset-btn.pos { color: var(--positive); border-color: #d1f0d9; }
 .preset-btn.neg { color: var(--negative); border-color: #fdd; }
-.preset-btn.selected.pos {
-  background: var(--positive);
-  color: #fff;
-  border-color: var(--positive);
-}
-.preset-btn.selected.neg {
-  background: var(--negative);
-  color: #fff;
-  border-color: var(--negative);
-}
+.preset-btn.selected.pos { background: var(--positive); color: #fff; border-color: var(--positive); }
+.preset-btn.selected.neg { background: var(--negative); color: #fff; border-color: var(--negative); }
+
+[data-theme="dark"] .preset-btn.pos { border-color: #1a4a1a; }
+[data-theme="dark"] .preset-btn.neg { border-color: #4a1a1a; }
 
 /* Custom score */
 .custom-score-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 4px;
+  display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 4px;
 }
 .custom-score-label { font-size: 13px; color: var(--secondary); }
 .custom-score-input {
-  width: 80px;
-  height: 40px;
-  text-align: center;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  background: var(--card);
-  -webkit-appearance: none;
+  width: 80px; height: 40px; text-align: center; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 16px; font-weight: 600; background: var(--card);
+  color: var(--text); -webkit-appearance: none; transition: background 0.3s, color 0.3s;
 }
 .custom-score-input:focus { outline: none; border-color: var(--primary); }
 
 /* Buttons */
 .btn-primary {
-  width: 100%;
-  height: 50px;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.12s;
-  margin-top: 16px;
+  width: 100%; height: 50px; background: var(--primary); color: #fff; border: none;
+  border-radius: var(--radius); font-size: 17px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.12s; margin-top: 16px;
 }
 .btn-primary:active { opacity: 0.8; }
 .btn-primary:disabled { opacity: 0.35; pointer-events: none; }
 
 .btn-secondary {
-  padding: 8px 18px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  color: var(--text);
+  padding: 8px 18px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text);
+  transition: background 0.3s, color 0.3s;
 }
-.btn-secondary:active { background: var(--border); }
+.btn-secondary:active { opacity: 0.7; }
 
 .btn-danger {
-  padding: 6px 14px;
-  background: none;
-  border: 1px solid var(--negative);
-  border-radius: 6px;
-  color: var(--negative);
-  font-size: 13px;
-  cursor: pointer;
+  padding: 6px 14px; background: none; border: 1px solid var(--negative);
+  border-radius: 6px; color: var(--negative); font-size: 13px; cursor: pointer;
 }
-.btn-danger:active { background: #ffe5e5; }
+.btn-danger:active { background: rgba(255,59,48,0.1); }
 
 .btn-sm {
-  height: 36px;
-  padding: 0 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  background: var(--primary);
-  color: #fff;
-  white-space: nowrap;
+  height: 36px; padding: 0 16px; border-radius: 8px; font-size: 14px; font-weight: 500;
+  border: none; cursor: pointer; background: var(--primary); color: #fff; white-space: nowrap;
 }
 .btn-sm:active { opacity: 0.8; }
 .btn-sm.danger { background: var(--negative); }
 
 /* Toast */
 #toast {
-  position: fixed;
-  top: 24px;
-  left: 50%;
+  position: fixed; top: 24px; left: 50%;
   transform: translateX(-50%) translateY(-120px);
-  background: #1c1c1e;
-  color: #fff;
-  padding: 10px 24px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 1000;
+  background: #1c1c1e; color: #fff; padding: 10px 24px; border-radius: 20px;
+  font-size: 14px; font-weight: 500; z-index: 1000;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: none;
 }
 #toast.show { transform: translateX(-50%) translateY(0); }
 
-/* Modal */
+/* Modals */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 500;
+  position: fixed; inset: 0; background: var(--modal-overlay);
+  display: flex; align-items: center; justify-content: center; z-index: 500;
   animation: fadeIn 0.15s;
 }
 .modal-box {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 24px 20px 20px;
-  width: 290px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  animation: scaleIn 0.2s;
+  background: var(--card); border-radius: 14px; padding: 24px 20px 20px;
+  width: 310px; max-height: 90vh; overflow-y: auto; text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: scaleIn 0.2s;
+  transition: background 0.3s;
 }
-.modal-msg { font-size: 15px; margin-bottom: 20px; line-height: 1.5; }
+.modal-msg { font-size: 15px; margin-bottom: 20px; line-height: 1.5; text-align: center; }
 .modal-actions { display: flex; gap: 10px; }
 .modal-actions button {
-  flex: 1;
-  height: 42px;
-  border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
+  flex: 1; height: 42px; border-radius: 10px; border: none;
+  font-size: 15px; font-weight: 500; cursor: pointer;
 }
 .modal-cancel { background: var(--bg); color: var(--text); }
 .modal-confirm { background: var(--negative); color: #fff; }
-.modal-cancel:active, .modal-confirm:active { opacity: 0.8; }
+.modal-primary { background: var(--primary); color: #fff; }
+.modal-cancel:active, .modal-confirm:active, .modal-primary:active { opacity: 0.8; }
+
+/* Edit modal specific */
+.edit-score-row { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+.edit-score-btn {
+  width: 44px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border);
+  font-size: 14px; font-weight: 600; cursor: pointer; background: var(--card);
+  transition: all 0.12s; color: var(--text);
+}
+.edit-score-btn:active { transform: scale(0.93); }
+.edit-score-btn.pos { color: var(--positive); }
+.edit-score-btn.neg { color: var(--negative); }
+.edit-score-btn.selected.pos { background: var(--positive); color: #fff; border-color: var(--positive); }
+.edit-score-btn.selected.neg { background: var(--negative); color: #fff; border-color: var(--negative); }
+.edit-note { margin: 8px 0; }
+.edit-label { font-size: 13px; color: var(--secondary); text-align: left; margin-bottom: 4px; }
 
 /* Detail screen */
 .detail-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
 }
 .back-btn {
-  width: 36px; height: 36px;
-  border: none; background: var(--card);
-  border-radius: 50%;
-  font-size: 20px; cursor: pointer;
+  width: 36px; height: 36px; border: none; background: var(--card);
+  border-radius: 50%; font-size: 20px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--shadow); flex-shrink: 0;
+  box-shadow: var(--shadow); flex-shrink: 0; color: var(--text);
 }
 .back-btn:active { background: var(--bg); }
 .detail-person-name { font-size: 20px; font-weight: 700; flex: 1; }
@@ -392,13 +275,11 @@ main {
 
 /* Event card */
 .event-card {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  display: flex; gap: 12px; align-items: flex-start; cursor: pointer;
 }
+.event-card:active { opacity: 0.7; }
 .event-score {
-  width: 50px; height: 32px;
-  border-radius: 8px;
+  width: 50px; height: 32px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
   font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
 }
@@ -406,32 +287,36 @@ main {
 .event-score.neg { background: var(--negative); }
 .event-body { flex: 1; min-width: 0; }
 .event-note { font-size: 15px; line-height: 1.4; word-break: break-all; }
-.event-date { font-size: 12px; color: var(--secondary); margin-top: 3px; }
-.event-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.event-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.event-cat-badge {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: var(--avatar-bg); color: var(--primary); font-weight: 500;
+}
+.event-date { font-size: 12px; color: var(--secondary); }
 .event-del-btn {
-  background: none; border: none; color: #c7c7cc;
-  font-size: 18px; cursor: pointer; padding: 4px; line-height: 1;
+  background: none; border: none; color: #c7c7cc; font-size: 18px; cursor: pointer;
+  padding: 4px; line-height: 1; flex-shrink: 0;
 }
 .event-del-btn:active { color: var(--negative); }
 
 /* Empty state */
-.empty-state { text-align: center; padding: 40px 16px; color: var(--secondary); }
+.empty-state {
+  text-align: center; padding: 40px 16px; color: var(--secondary);
+}
 .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-text { font-size: 15px; line-height: 1.5; }
 
 /* Settings */
 .input-row { display: flex; gap: 8px; }
-
 .text-input {
-  flex: 1; height: 44px; padding: 0 14px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  font-size: 15px; -webkit-appearance: none; background: var(--card); color: var(--text);
+  flex: 1; height: 44px; padding: 0 14px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 15px; -webkit-appearance: none;
+  background: var(--card); color: var(--text); transition: background 0.3s, color 0.3s;
 }
 .text-input:focus { outline: none; border-color: var(--primary); }
 
 .manage-person-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 0;
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 0;
 }
 .manage-person-row + .manage-person-row { border-top: 1px solid var(--border); }
 .manage-person-name { font-size: 15px; font-weight: 500; }
@@ -444,29 +329,88 @@ main {
 .data-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .data-btn-row button { flex: 1; min-width: 100px; }
 
+/* Theme selector */
+.theme-row {
+  display: flex; gap: 6px; background: var(--bg); border-radius: 10px; padding: 4px;
+}
+.theme-opt {
+  flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px;
+  font-size: 13px; cursor: pointer; transition: all 0.2s; border: none;
+  background: transparent; color: var(--secondary);
+}
+.theme-opt.active { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--shadow); }
+
+/* PIN screen */
+#pin-screen {
+  position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 24px; transition: background 0.3s;
+}
+#pin-screen.hidden { display: none; }
+.pin-icon { font-size: 56px; }
+.pin-title { font-size: 18px; font-weight: 600; color: var(--text); }
+.pin-subtitle { font-size: 14px; color: var(--secondary); }
+.pin-dots { display: flex; gap: 16px; }
+.pin-dot {
+  width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border);
+  transition: all 0.2s; background: transparent;
+}
+.pin-dot.filled { background: var(--primary); border-color: var(--primary); }
+.pin-dot.shake { animation: shakeDots 0.4s ease; }
+
+.pin-pad {
+  display: grid; grid-template-columns: repeat(3, 70px); gap: 10px;
+}
+.pin-key {
+  width: 70px; height: 56px; border-radius: 28px; border: 1px solid var(--border);
+  background: var(--card); font-size: 24px; font-weight: 500; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; color: var(--text);
+  transition: all 0.12s;
+}
+.pin-key:active { background: var(--border); transform: scale(0.94); }
+.pin-key.empty { border: none; background: none; font-size: 16px; color: var(--secondary); }
+
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes shakeDots {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
 
-/* Highlight updated card */
-@keyframes flashGreen { 0% { background: #d4f5dd; } 100% { background: var(--card); } }
-.flash { animation: flashGreen 0.6s ease; }
-
-/* Responsive */
 @media (min-width: 480px) {
   body { background: #e8e8ed; }
+  [data-theme="dark"] body { background: #000; }
   #app { box-shadow: 0 0 40px rgba(0,0,0,0.15); }
 }
 </style>
 </head>
 <body>
 <div id="app">
+  <!-- PIN Screen -->
+  <div id="pin-screen" class="hidden">
+    <div class="pin-icon">🔐</div>
+    <div class="pin-title" id="pin-title">输入密码</div>
+    <div class="pin-subtitle" id="pin-subtitle"></div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="pin-pad" id="pin-pad"></div>
+  </div>
+
   <main>
+    <!-- Record tab -->
     <div id="screen-record" class="screen active">
       <div class="screen-title">📝 记录事件</div>
       <div id="person-list"></div>
       <div class="section-label">事件备注</div>
       <textarea id="note-input" class="note-textarea" placeholder="TA做了什么...（可选）"></textarea>
+      <div class="section-label">分类标签</div>
+      <div id="cat-chips" class="cat-chips"></div>
       <div class="section-label">评分</div>
       <div class="score-presets">
         <div class="preset-row" id="neg-presets"></div>
@@ -479,11 +423,13 @@ main {
       <button id="save-btn" class="btn-primary" disabled>保存记录</button>
     </div>
 
+    <!-- People tab -->
     <div id="screen-people" class="screen">
       <div class="screen-title">👥 人物列表</div>
       <div id="people-list"></div>
     </div>
 
+    <!-- Settings tab -->
     <div id="screen-settings" class="screen">
       <div class="screen-title">⚙️ 设置</div>
       <div class="section-label">添加人物</div>
@@ -496,6 +442,19 @@ main {
         <div id="manage-people-list"></div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title">外观</div>
+        <div class="theme-row" id="theme-selector">
+          <button class="theme-opt" data-theme="auto">跟随系统</button>
+          <button class="theme-opt" data-theme="light">浅色</button>
+          <button class="theme-opt" data-theme="dark">深色</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">安全</div>
+        <button id="pin-setup-btn" class="btn-secondary" style="width:100%;">🔐 设置应用密码</button>
+        <button id="pin-remove-btn" class="btn-danger" style="width:100%;margin-top:8px;display:none;">移除密码</button>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title">数据管理</div>
         <div class="data-btn-row">
           <button id="export-btn" class="btn-secondary">导出备份</button>
@@ -505,6 +464,7 @@ main {
       </div>
     </div>
 
+    <!-- Detail screen -->
     <div id="screen-detail" class="screen">
       <div class="detail-header">
         <button class="back-btn">←</button>
@@ -528,23 +488,58 @@ main {
 (function() {
   'use strict';
 
+  // ── Constants ──────────────────────────────────
+  const CATEGORIES = ['守信','帮忙','靠谱','大方','失信','添乱','掉链子','小气','冷漠','其他'];
+  const QUICK_SCORE = 5;
+
   // ── State ──────────────────────────────────────
-  let data = { people: [], events: [] };
+  let data = { people: [], events: [], settings: { pin: null, theme: 'auto' } };
   let currentTab = 'record';
   let detailPersonId = null;
   let selectedPersonId = null;
   let currentScore = null;
+  let currentCategory = '其他';
+  // PIN
+  let pinMode = null; // 'enter' | 'setup' | 'confirm'
+  let pinEntry = '';
+  let pinFirst = '';
+  // Session
+  let unlocked = sessionStorage.getItem('ps_unlocked') === '1';
   let toastTimer = null;
 
   const $ = s => document.querySelector(s);
   const $$ = s => document.querySelectorAll(s);
 
+  // ── Theme ──────────────────────────────────────
+  function applyTheme() {
+    const t = data.settings.theme;
+    if (t === 'auto') {
+      document.documentElement.setAttribute('data-theme',
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+  }
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (data.settings.theme === 'auto') applyTheme();
+  });
+
   // ── Persistence ────────────────────────────────
   function load() {
     try {
       const raw = localStorage.getItem('ps_data');
-      if (raw) data = JSON.parse(raw);
-    } catch(e) { data = { people: [], events: [] }; }
+      if (raw) {
+        data = JSON.parse(raw);
+        if (!data.settings) data.settings = { pin: null, theme: 'auto' };
+        if (!data.settings.theme) data.settings.theme = 'auto';
+        if (data.settings.pin === undefined) data.settings.pin = null;
+      }
+      // migrate events without category
+      data.events.forEach(e => { if (!e.category) e.category = '其他'; });
+    } catch(e) {
+      data = { people: [], events: [], settings: { pin: null, theme: 'auto' } };
+    }
   }
 
   function save() {
@@ -556,19 +551,14 @@ main {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
-  function getPerson(id) {
-    return data.people.find(p => p.id === id);
-  }
+  function getPerson(id) { return data.people.find(p => p.id === id); }
 
   function getScore(personId) {
-    return data.events
-      .filter(e => e.personId === personId)
-      .reduce((sum, e) => sum + e.score, 0);
+    return data.events.filter(e => e.personId === personId).reduce((sum, e) => sum + e.score, 0);
   }
 
   function getEvents(personId) {
-    return data.events
-      .filter(e => e.personId === personId)
+    return data.events.filter(e => e.personId === personId)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 
@@ -578,13 +568,11 @@ main {
   }
 
   function fmtDate(iso) {
-    const d = new Date(iso);
-    const now = new Date();
+    const d = new Date(iso); const now = new Date();
     const diff = now - d;
     const mins = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-
     if (mins < 1) return '刚刚';
     if (mins < 60) return mins + '分钟前';
     if (hours < 24) return hours + '小时前';
@@ -597,16 +585,12 @@ main {
   }
 
   function scoreClass(n) {
-    if (n > 0) return 'pos';
-    if (n < 0) return 'neg';
-    return '';
+    if (n > 0) return 'pos'; if (n < 0) return 'neg'; return '';
   }
 
-  function scoreText(n) {
-    return (n > 0 ? '+' : '') + n;
-  }
+  function scoreText(n) { return (n > 0 ? '+' : '') + n; }
 
-  // ── Toast ───────────────────────────────────────
+  // ── Toast ──────────────────────────────────────
   function toast(msg) {
     const el = $('#toast');
     el.textContent = msg;
@@ -616,7 +600,7 @@ main {
   }
 
   // ── Confirm modal ──────────────────────────────
-  function confirmDialog(msg) {
+  function confirmDialog(msg, confirmText, confirmClass) {
     return new Promise(resolve => {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
@@ -625,30 +609,116 @@ main {
           <div class="modal-msg">${msg}</div>
           <div class="modal-actions">
             <button class="modal-cancel">取消</button>
-            <button class="modal-confirm">确定</button>
+            <button class="${confirmClass || 'modal-confirm'}">${confirmText || '确定'}</button>
           </div>
         </div>`;
       document.body.appendChild(overlay);
-
-      overlay.querySelector('.modal-cancel').onclick = () => {
-        overlay.remove();
-        resolve(false);
-      };
-      overlay.querySelector('.modal-confirm').onclick = () => {
-        overlay.remove();
-        resolve(true);
-      };
-      overlay.onclick = (e) => {
-        if (e.target === overlay) { overlay.remove(); resolve(false); }
-      };
+      overlay.querySelector('.modal-cancel').onclick = () => { overlay.remove(); resolve(false); };
+      overlay.querySelector('.modal-actions button:last-child').onclick = () => { overlay.remove(); resolve(true); };
+      overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(false); } };
     });
+  }
+
+  // ── PIN ────────────────────────────────────────
+  function initPinScreen() {
+    // build keypad
+    const pad = $('#pin-pad');
+    const keys = [1,2,3,4,5,6,7,8,9,'清',0,'⌫'];
+    pad.innerHTML = keys.map(k => {
+      if (k === '清' || k === '⌫') return `<div class="pin-key empty" data-key="${k}">${k}</div>`;
+      return `<div class="pin-key" data-key="${k}">${k}</div>`;
+    }).join('');
+
+    pad.onclick = (e) => {
+      const key = e.target.dataset.key;
+      if (!key) return;
+      if (key === '清') { pinEntry = ''; updateDots(); return; }
+      if (key === '⌫') { pinEntry = pinEntry.slice(0, -1); updateDots(); return; }
+      if (pinEntry.length >= 4) return;
+      pinEntry += key;
+      updateDots();
+      if (pinEntry.length === 4) handlePinComplete();
+    };
+  }
+
+  function updateDots() {
+    const dots = $$('#pin-dots .pin-dot');
+    dots.forEach((d, i) => d.classList.toggle('filled', i < pinEntry.length));
+    dots.forEach(d => d.classList.remove('shake'));
+  }
+
+  function showPinScreen(mode) {
+    pinMode = mode;
+    pinEntry = '';
+    updateDots();
+    $('#pin-screen').classList.remove('hidden');
+    $('#pin-dots').classList.remove('shake');
+
+    if (mode === 'enter') {
+      $('#pin-title').textContent = '输入密码';
+      $('#pin-subtitle').textContent = '';
+    } else if (mode === 'setup') {
+      $('#pin-title').textContent = '设置密码';
+      $('#pin-subtitle').textContent = '输入 4 位数字密码';
+    } else if (mode === 'confirm') {
+      $('#pin-title').textContent = '确认密码';
+      $('#pin-subtitle').textContent = '再次输入以确认';
+    }
+  }
+
+  function hidePinScreen() {
+    $('#pin-screen').classList.add('hidden');
+  }
+
+  function handlePinComplete() {
+    setTimeout(() => {
+      if (pinMode === 'enter') {
+        if (pinEntry === data.settings.pin) {
+          unlocked = true;
+          sessionStorage.setItem('ps_unlocked', '1');
+          hidePinScreen();
+          toast('欢迎回来');
+        } else {
+          shakeDots();
+          pinEntry = '';
+        }
+      } else if (pinMode === 'setup') {
+        pinFirst = pinEntry;
+        pinEntry = '';
+        showPinScreen('confirm');
+      } else if (pinMode === 'confirm') {
+        if (pinEntry === pinFirst) {
+          data.settings.pin = pinEntry;
+          unlocked = true;
+          sessionStorage.setItem('ps_unlocked', '1');
+          save();
+          hidePinScreen();
+          render();
+          toast('密码已设置');
+        } else {
+          shakeDots();
+          pinEntry = '';
+          pinFirst = '';
+          showPinScreen('setup');
+          $('#pin-subtitle').textContent = '两次输入不一致，请重新设置';
+        }
+      }
+      updateDots();
+    }, 150);
+  }
+
+  function shakeDots() {
+    const el = $('#pin-dots');
+    el.classList.add('shake');
+    setTimeout(() => el.classList.remove('shake'), 400);
   }
 
   // ── Navigation ─────────────────────────────────
   function switchTab(tab) {
     currentTab = tab;
     detailPersonId = null;
-    selectedPersonId = (tab === 'record' && data.people.length === 1) ? data.people[0].id : null;
+    if (tab === 'record' && data.people.length === 1) selectedPersonId = data.people[0].id;
+    if (tab !== 'record') selectedPersonId = null;
     currentScore = null;
     render();
   }
@@ -671,65 +741,68 @@ main {
     if (data.people.some(p => p.name === name)) { toast('该名字已存在'); return; }
     data.people.push({ id: uid(), name, createdAt: new Date().toISOString() });
     if (data.people.length === 1) selectedPersonId = data.people[0].id;
-    save();
-    render();
-    toast('已添加 ' + name);
+    save(); render(); toast('已添加 ' + name);
   }
 
   async function deletePerson(id) {
     const person = getPerson(id);
     if (!person) return;
-    const ok = await confirmDialog('确定要删除「' + person.name + '」及其所有记录吗？');
+    const ok = await confirmDialog('确定要删除「' + esc(person.name) + '」及其所有记录吗？');
     if (!ok) return;
     data.people = data.people.filter(p => p.id !== id);
     data.events = data.events.filter(e => e.personId !== id);
-    if (selectedPersonId === id) {
-      selectedPersonId = data.people.length > 0 ? data.people[0].id : null;
-    }
+    if (selectedPersonId === id) selectedPersonId = data.people.length > 0 ? data.people[0].id : null;
     if (detailPersonId === id) goBack();
-    save();
-    render();
-    toast('已删除 ' + person.name);
+    save(); render();
+    toast('已删除 ' + esc(person.name));
   }
 
-  function addEvent() {
-    if (!selectedPersonId || currentScore === null || currentScore === 0) return;
-    const note = $('#note-input').value.trim();
+  function addEvent(personId, score, note, category) {
     data.events.push({
-      id: uid(),
-      personId: selectedPersonId,
-      score: currentScore,
+      id: uid(), personId, score,
       note: note || '（无备注）',
+      category: category || '其他',
       createdAt: new Date().toISOString()
     });
     save();
-    // Reset form but keep person selected
+  }
+
+  function handleSaveEvent() {
+    if (!selectedPersonId || currentScore === null || currentScore === 0) return;
+    addEvent(selectedPersonId, currentScore, $('#note-input').value.trim(), currentCategory);
     $('#note-input').value = '';
     currentScore = null;
+    currentCategory = '其他';
     $('#custom-score').value = '';
     render();
     toast('已记录 ' + scoreText(currentScore));
-    // scroll to the person card that was just updated
-    if (detailPersonId === selectedPersonId) {
-      // we're on detail page, just re-rendered
-    }
+  }
+
+  function quickScore(personId, score) {
+    const cat = score > 0 ? '其他' : '其他';
+    const note = score > 0 ? '快捷加分' : '快捷减分';
+    data.events.push({
+      id: uid(), personId, score,
+      note, category: cat,
+      createdAt: new Date().toISOString()
+    });
+    save();
+    if (detailPersonId === personId) render();
+    else renderPeopleTab();
+    toast(scoreText(score) + ' ' + esc(getPerson(personId).name));
   }
 
   async function deleteEvent(eventId) {
     const ok = await confirmDialog('确定要删除这条记录吗？');
     if (!ok) return;
     data.events = data.events.filter(e => e.id !== eventId);
-    save();
-    if (detailPersonId && getEvents(detailPersonId).length === 0) {
-      // stay on detail, will show empty state
-    }
-    render();
+    save(); render();
     toast('已删除');
   }
 
   function selectPerson(id) {
     selectedPersonId = id;
-    renderRecordTab();
+    renderRecordForm();
   }
 
   function setScore(val) {
@@ -741,18 +814,126 @@ main {
 
   function setCustomScore(val) {
     const n = parseInt(val);
-    if (isNaN(n)) {
-      currentScore = null;
-    } else {
-      currentScore = n;
-    }
+    currentScore = isNaN(n) ? null : n;
     renderScorePresets();
     updateSaveBtn();
   }
 
   function updateSaveBtn() {
-    const btn = $('#save-btn');
-    btn.disabled = !(selectedPersonId && currentScore !== null && currentScore !== 0);
+    $('#save-btn').disabled = !(selectedPersonId && currentScore !== null && currentScore !== 0);
+  }
+
+  // ── Edit modal ─────────────────────────────────
+  function showEditModal(event) {
+    return new Promise(resolve => {
+      const presets = [-20,-10,-5,-3,-1,1,3,5,10,20];
+      let editScore = event.score;
+      let editNote = event.note === '快捷加分' || event.note === '快捷减分' || event.note === '（无备注）' ? '' : event.note;
+      let editCat = event.category || '其他';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+
+      function renderEditModal() {
+        overlay.innerHTML = `
+          <div class="modal-box">
+            <div style="font-size:17px;font-weight:700;margin-bottom:12px;">编辑记录</div>
+            <div class="edit-label">评分</div>
+            <div class="edit-score-row">
+              ${presets.map(v => {
+                const cls = v > 0 ? 'pos' : 'neg';
+                const sel = editScore === v ? ' selected' : '';
+                return `<button class="edit-score-btn ${cls}${sel}" data-sv="${v}">${scoreText(v)}</button>`;
+              }).join('')}
+            </div>
+            <div style="text-align:center;margin-bottom:8px;">
+              <input type="number" class="custom-score-input" style="width:80px;" value="${editScore}" placeholder="自定义">
+            </div>
+            <div class="edit-label">分类</div>
+            <div class="cat-chips" style="justify-content:center;margin-bottom:8px;">
+              ${CATEGORIES.map(c =>
+                `<span class="cat-chip${editCat === c ? ' selected' : ''}" data-cat="${c}">${c}</span>`
+              ).join('')}
+            </div>
+            <div class="edit-label">备注</div>
+            <textarea class="note-textarea edit-note" style="min-height:52px;">${esc(editNote)}</textarea>
+            <div class="modal-actions" style="margin-top:14px;">
+              <button class="modal-cancel">取消</button>
+              <button class="modal-primary">保存</button>
+            </div>
+          </div>`;
+
+        document.body.appendChild(overlay);
+
+        // Bind handlers
+        overlay.querySelector('.modal-cancel').onclick = () => { overlay.remove(); resolve(null); };
+        overlay.querySelector('.modal-primary').onclick = () => {
+          overlay.remove();
+          resolve({ score: editScore, note: editNote, category: editCat });
+        };
+        overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(null); } };
+
+        // Score preset buttons
+        overlay.querySelectorAll('.edit-score-btn').forEach(b => {
+          b.onclick = () => {
+            editScore = parseInt(b.dataset.sv);
+            renderEditModalInner();
+          };
+        });
+
+        // Custom score input
+        const ci = overlay.querySelector('.custom-score-input');
+        ci.oninput = function() {
+          const v = parseInt(this.value);
+          if (!isNaN(v)) editScore = v;
+          renderEditModalInner();
+        };
+        ci.onkeydown = function(e) { if (e.key === 'Enter') e.preventDefault(); };
+
+        // Category chips
+        overlay.querySelectorAll('.cat-chip').forEach(chip => {
+          chip.onclick = () => {
+            editCat = chip.dataset.cat;
+            renderEditModalInner();
+          };
+        });
+
+        // Note
+        overlay.querySelector('.edit-note').oninput = function() {
+          editNote = this.value;
+        };
+      }
+
+      function renderEditModalInner() {
+        // Update score buttons
+        overlay.querySelectorAll('.edit-score-btn').forEach(b => {
+          const v = parseInt(b.dataset.sv);
+          b.classList.toggle('selected', editScore === v);
+        });
+        // Update custom input
+        const ci = overlay.querySelector('.custom-score-input');
+        if (ci !== document.activeElement) ci.value = editScore;
+        // Update category chips
+        overlay.querySelectorAll('.cat-chip').forEach(chip => {
+          chip.classList.toggle('selected', chip.dataset.cat === editCat);
+        });
+      }
+
+      renderEditModal();
+    });
+  }
+
+  async function editEvent(eventId) {
+    const ev = data.events.find(e => e.id === eventId);
+    if (!ev) return;
+    const result = await showEditModal(ev);
+    if (!result) return;
+    ev.score = result.score;
+    ev.note = result.note || '（无备注）';
+    ev.category = result.category;
+    save();
+    render();
+    toast('已更新');
   }
 
   // ── Render ─────────────────────────────────────
@@ -763,30 +944,32 @@ main {
       showScreen('detail');
     } else {
       showScreen(currentTab);
-      if (currentTab === 'record') renderRecordTab();
+      if (currentTab === 'record') renderRecordForm();
       if (currentTab === 'people') renderPeopleTab();
       if (currentTab === 'settings') renderSettingsTab();
     }
+    updatePinButton();
   }
 
   function showScreen(name) {
     $$('.screen').forEach(s => s.classList.remove('active'));
     const screen = $('#screen-' + name);
     if (screen) screen.classList.add('active');
-    // show/hide tab bar
     $('#tab-bar').style.display = (name === 'detail') ? 'none' : 'flex';
-    // adjust main padding when no tab bar
     $('main').style.paddingBottom = (name === 'detail') ? '20px' : '90px';
   }
 
   function renderTabBar() {
-    $$('.tab-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === currentTab);
-    });
+    $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === currentTab));
+  }
+
+  function updatePinButton() {
+    $('#pin-setup-btn').style.display = data.settings.pin ? 'none' : 'block';
+    $('#pin-remove-btn').style.display = data.settings.pin ? 'block' : 'none';
   }
 
   // ── Record tab ─────────────────────────────────
-  function renderRecordTab() {
+  function renderRecordForm() {
     const container = $('#person-list');
     if (data.people.length === 0) {
       container.innerHTML = `
@@ -795,6 +978,7 @@ main {
           <div class="empty-text">还没有添加任何人<br>请先在「设置」中添加</div>
           <button class="btn-secondary mt-16" onclick="window._goSettings()">去添加</button>
         </div>`;
+      $('#cat-chips').innerHTML = '';
     } else {
       container.innerHTML = data.people.map(p => {
         const sc = getScore(p.id);
@@ -807,13 +991,21 @@ main {
             <span class="item-score ${scls}">${scoreText(sc)}</span>
           </div>`;
       }).join('');
+      container.querySelectorAll('.person-select-item').forEach(el => {
+        el.onclick = () => selectPerson(el.dataset.pid);
+      });
+
+      // category chips
+      $('#cat-chips').innerHTML = CATEGORIES.map(c =>
+        `<span class="cat-chip${currentCategory === c ? ' selected' : ''}" data-cat="${c}">${c}</span>`
+      ).join('');
+      $('#cat-chips').querySelectorAll('.cat-chip').forEach(chip => {
+        chip.onclick = () => {
+          currentCategory = chip.dataset.cat;
+          renderRecordForm();
+        };
+      });
     }
-
-    // bind events
-    container.querySelectorAll('.person-select-item').forEach(el => {
-      el.onclick = () => selectPerson(el.dataset.pid);
-    });
-
     renderScorePresets();
     updateSaveBtn();
   }
@@ -832,14 +1024,11 @@ main {
       return `<button class="preset-btn pos${sel}" data-score="${v}">+${v}</button>`;
     }).join('');
 
-    // bind
     $$('.preset-btn').forEach(b => {
       b.onclick = () => setScore(parseInt(b.dataset.score));
     });
 
-    if (currentScore !== null) {
-      $('#custom-score').value = currentScore;
-    }
+    if (currentScore !== null) $('#custom-score').value = currentScore;
   }
 
   // ── People tab ─────────────────────────────────
@@ -857,8 +1046,7 @@ main {
     const sorted = [...data.people].sort((a, b) => getScore(b.id) - getScore(a.id));
 
     container.innerHTML = sorted.map(p => {
-      const sc = getScore(p.id);
-      const scls = scoreClass(sc);
+      const sc = getScore(p.id); const scls = scoreClass(sc);
       const last = getLastEvent(p.id);
       const preview = last ? last.note : '暂无记录';
       return `
@@ -869,11 +1057,26 @@ main {
             <div class="person-last-event">${esc(preview)}</div>
           </div>
           <span class="person-score ${scls}">${scoreText(sc)}</span>
+          <div class="quick-btns">
+            <button class="quick-btn plus" data-pid="${p.id}" data-q="1">+</button>
+            <button class="quick-btn minus" data-pid="${p.id}" data-q="-1">−</button>
+          </div>
         </div>`;
     }).join('');
 
     container.querySelectorAll('.person-card').forEach(el => {
-      el.onclick = () => showDetail(el.dataset.pid);
+      el.onclick = (e) => {
+        if (e.target.closest('.quick-btn')) return;
+        showDetail(el.dataset.pid);
+      };
+    });
+
+    container.querySelectorAll('.quick-btn').forEach(b => {
+      b.onclick = (e) => {
+        e.stopPropagation();
+        const sign = parseInt(b.dataset.q);
+        quickScore(b.dataset.pid, sign * QUICK_SCORE);
+      };
     });
   }
 
@@ -902,20 +1105,27 @@ main {
       container.innerHTML = events.map(e => {
         const scls2 = scoreClass(e.score);
         return `
-          <div class="card event-card">
+          <div class="card event-card" data-eid="${e.id}">
             <div class="event-score ${scls2}">${scoreText(e.score)}</div>
             <div class="event-body">
               <div class="event-note">${esc(e.note)}</div>
-              <div class="event-date">${fmtDate(e.createdAt)}</div>
+              <div class="event-meta">
+                <span class="event-cat-badge">${esc(e.category || '其他')}</span>
+                <span class="event-date">${fmtDate(e.createdAt)}</span>
+              </div>
             </div>
-            <div class="event-actions">
-              <button class="event-del-btn" data-eid="${e.id}">✕</button>
-            </div>
+            <button class="event-del-btn" data-eid="${e.id}">✕</button>
           </div>`;
       }).join('');
     }
 
-    // bind delete buttons
+    container.querySelectorAll('.event-card').forEach(card => {
+      card.onclick = (e) => {
+        if (e.target.closest('.event-del-btn')) return;
+        editEvent(card.dataset.eid);
+      };
+    });
+
     container.querySelectorAll('.event-del-btn').forEach(b => {
       b.onclick = (e) => {
         e.stopPropagation();
@@ -926,7 +1136,6 @@ main {
 
   // ── Settings tab ───────────────────────────────
   function renderSettingsTab() {
-    // Manage people list
     const list = $('#manage-people-list');
     if (data.people.length === 0) {
       list.innerHTML = '<div style="color:var(--secondary);font-size:14px;padding:8px 0;">暂无人物</div>';
@@ -936,11 +1145,16 @@ main {
           <span class="manage-person-name">${esc(p.name)}</span>
           <button class="btn-danger" data-pid="${p.id}">删除</button>
         </div>`).join('');
-
       list.querySelectorAll('.btn-danger').forEach(b => {
         b.onclick = () => deletePerson(b.dataset.pid);
       });
     }
+
+    // Theme selector
+    const currentTheme = data.settings.theme;
+    $$('#theme-selector .theme-opt').forEach(opt => {
+      opt.classList.toggle('active', opt.dataset.theme === currentTheme);
+    });
   }
 
   function esc(s) {
@@ -963,8 +1177,7 @@ main {
 
   function importData() {
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
+    input.type = 'file'; input.accept = '.json';
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
@@ -977,15 +1190,16 @@ main {
         );
         if (!ok) return;
         data = imported;
+        if (!data.settings) data.settings = { pin: null, theme: 'auto' };
+        if (!data.settings.theme) data.settings.theme = 'auto';
+        if (data.settings.pin === undefined) data.settings.pin = null;
+        data.events.forEach(e => { if (!e.category) e.category = '其他'; });
         selectedPersonId = data.people.length > 0 ? data.people[0].id : null;
-        currentScore = null;
-        detailPersonId = null;
-        save();
-        render();
+        currentScore = null; detailPersonId = null;
+        applyTheme();
+        save(); render();
         toast('导入成功');
-      } catch(e) {
-        toast('文件格式错误');
-      }
+      } catch(e) { toast('文件格式错误'); }
     };
     input.click();
   }
@@ -993,48 +1207,51 @@ main {
   async function resetAll() {
     const ok = await confirmDialog('确定要清除所有数据吗？此操作不可恢复！');
     if (!ok) return;
-    data = { people: [], events: [] };
-    selectedPersonId = null;
-    currentScore = null;
-    detailPersonId = null;
-    save();
-    render();
+    data = { people: [], events: [], settings: { pin: null, theme: 'auto' } };
+    selectedPersonId = null; currentScore = null; detailPersonId = null;
+    applyTheme(); save(); render();
     toast('已清除全部数据');
   }
 
-  // ── Global helpers for HTML onclick ────────────
+  // ── PIN Setup ──────────────────────────────────
+  async function setupPin() {
+    if (data.settings.pin) {
+      const ok = await confirmDialog('已设置密码，要修改吗？', '修改', 'modal-primary');
+      if (!ok) return;
+    }
+    showPinScreen('setup');
+  }
+
+  async function removePin() {
+    const ok = await confirmDialog('确定要移除密码吗？');
+    if (!ok) return;
+    data.settings.pin = null;
+    save();
+    updatePinButton();
+    toast('密码已移除');
+  }
+
+  // ── Global helpers ─────────────────────────────
   window._goSettings = () => switchTab('settings');
 
   // ── Event bindings ─────────────────────────────
   function bind() {
-    // Tab bar
     $$('.tab-btn').forEach(b => {
       b.onclick = () => switchTab(b.dataset.tab);
     });
 
-    // Back button
     $('.back-btn').onclick = goBack;
+    $('#save-btn').onclick = handleSaveEvent;
 
-    // Save button
-    $('#save-btn').onclick = addEvent;
-
-    // Custom score input
     $('#custom-score').oninput = function() {
       if (this.value === '' || this.value === '-') {
-        currentScore = null;
-        updateSaveBtn();
-        renderScorePresets();
-        return;
+        currentScore = null; updateSaveBtn(); renderScorePresets(); return;
       }
       setCustomScore(this.value);
     };
 
-    // Note input - allow Enter to focus score
     $('#note-input').onkeydown = function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        $('#custom-score').focus();
-      }
+      if (e.key === 'Enter') { e.preventDefault(); $('#custom-score').focus(); }
     };
 
     // Settings
@@ -1043,22 +1260,43 @@ main {
       $('#new-person-input').value = '';
     };
     $('#new-person-input').onkeydown = function(e) {
-      if (e.key === 'Enter') {
-        addPerson(this.value);
-        this.value = '';
-      }
+      if (e.key === 'Enter') { addPerson(this.value); this.value = ''; }
     };
     $('#export-btn').onclick = exportData;
     $('#import-btn').onclick = importData;
     $('#reset-btn').onclick = resetAll;
+
+    // Theme
+    $$('#theme-selector .theme-opt').forEach(opt => {
+      opt.onclick = () => {
+        data.settings.theme = opt.dataset.theme;
+        applyTheme();
+        save();
+        renderSettingsTab();
+      };
+    });
+
+    // PIN
+    $('#pin-setup-btn').onclick = setupPin;
+    $('#pin-remove-btn').onclick = removePin;
   }
 
   // ── Init ───────────────────────────────────────
   function init() {
     load();
+    applyTheme();
+    initPinScreen();
+
     if (data.people.length === 1) selectedPersonId = data.people[0].id;
-    bind();
-    render();
+
+    if (data.settings.pin && !unlocked) {
+      // Need PIN first
+      bind();
+      showPinScreen('enter');
+    } else {
+      bind();
+      render();
+    }
   }
 
   init();
