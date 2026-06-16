@@ -352,16 +352,17 @@ matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(data
 
 // ═══ Persistence ═════════════════
 function load(){
-  try{const raw=localStorage.getItem('ps_data');if(raw){data=JSON.parse(raw);migrate()}}catch(e){initDefaults();_dataCorrupted=true}
-  function initDefaults(){data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:true}}}
-  function migrate(){
-    const s=data.settings;if(!s)s={};s.theme=s.theme||'auto';s.quickScore=s.quickScore||5;
-    s.categories=s.categories||[...DEF_CATS];s.noteTemplates=s.noteTemplates||[...DEF_TMPLS];
-    s.groups=s.groups||[...DEF_GROUPS];if(s.vibrate===undefined)s.vibrate=true;
-    if(s.pin===undefined)s.pin=null;if(s._lastBackup===undefined)s._lastBackup=null;data.settings=s;
-    data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});
-    data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group||!s.groups.includes(p.group))p.group='其他'});
-  }
+  try{const raw=localStorage.getItem('ps_data');if(raw){data=JSON.parse(raw);migrate();return}}catch(e){}
+  try{const bak=localStorage.getItem('ps_data_bak');if(bak){data=JSON.parse(bak);migrate();_dataCorrupted=true;return}}catch(e){}
+  data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:true}};
+  _dataCorrupted=true}
+function migrate(){
+  const s=data.settings;if(!s)s={};s.theme=s.theme||'auto';s.quickScore=s.quickScore||5;
+  s.categories=s.categories||[...DEF_CATS];s.noteTemplates=s.noteTemplates||[...DEF_TMPLS];
+  s.groups=s.groups||[...DEF_GROUPS];if(s.vibrate===undefined)s.vibrate=true;
+  if(s.pin===undefined)s.pin=null;if(s._lastBackup===undefined)s._lastBackup=null;data.settings=s;
+  data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});
+  data.people.forEach(p=>{if(p.note===undefined)p.note='';if(!p.group||!s.groups.includes(p.group))p.group='其他'});
 }
 
 // ═══ Helpers ═════════════════════
