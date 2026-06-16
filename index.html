@@ -110,11 +110,12 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 .btn-primary{width:100%;height:52px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:17px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:14px;box-shadow:0 2px 8px rgba(0,122,255,0.25)}
 .btn-primary:active{opacity:0.85;transform:scale(0.98)}.btn-primary:disabled{opacity:0.3;pointer-events:none;box-shadow:none}
 .btn-secondary{padding:8px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;color:var(--text);font-weight:500;transition:all 0.12s}.btn-secondary:active{opacity:0.7}
+.data-btn-row{display:flex;gap:8px}.data-btn-row .btn-secondary{flex:1}
 .btn-danger{padding:8px 14px;background:none;border:1px solid var(--negative);border-radius:8px;color:var(--negative);font-size:13px;cursor:pointer;font-weight:500}.btn-danger:active{background:var(--negativeLight)}
 .btn-sm{height:36px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--primary);color:#fff;white-space:nowrap;transition:all 0.12s}.btn-sm:active{opacity:0.8}
 
 /* ═══════ Toast ═══════ */
-#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-130px);background:rgba(30,30,32,0.95);color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;font-weight:500;z-index:1000;transition:transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);pointer-events:auto;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-130px);background:rgba(30,30,32,0.95);color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;font-weight:500;z-index:1000;transition:transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);pointer-events:auto;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;white-space:nowrap}
 #toast.show{transform:translateX(-50%) translateY(0)}#toast .undo-btn{color:#FFD60A;background:none;border:none;font-size:14px;font-weight:600;cursor:pointer;padding:0;white-space:nowrap}
 
 /* ═══════ Modals ═══════ */
@@ -333,7 +334,7 @@ const MAX_UNDO=5,MAX_CHART_DOTS=18;
 let data={people:[],events:[],settings:{pin:null,theme:'auto',quickScore:5,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:true}};
 let currentTab='record',detailPersonId=null,selectedPersonId=null,undoStack=[];
 let currentScore=null,currentCategory='其他',pinMode=null,pinEntry='',pinFirst='';
-let unlocked=sessionStorage.getItem('ps_u')==='1',toastTimer=null,_saveTimer=null,_searchTimer=null;
+let unlocked=sessionStorage.getItem('ps_u')==='1',toastTimer=null,_searchTimer=null;
 let searchQuery='',timeFilter='全部',groupFilter='全部',_dataCorrupted=false;
 
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
@@ -428,7 +429,7 @@ function handleSaveEvent(){
   const dateStr=$('#event-date').value||todayStr();
   const ev=addEvent(selectedPersonId,currentScore,$('#note-input').value.trim(),currentCategory,dateStr,$('#reflection-input').value.trim());
   $('#note-input').value='';$('#reflection-input').value='';currentScore=null;currentCategory='其他';$('#custom-score').value='';
-  haptic();render();toast('已记录 '+scoreText(ev.score),undoLastEvent);
+  haptic();render();toast(scoreText(ev.score)+' '+esc(getPerson(selectedPersonId).name),undoLastEvent);
 }
 function quickScore(pid,score){
   const qs=data.settings.quickScore||5;const ev=addEvent(pid,score,'快捷'+scoreText(score),'其他',todayStr());
@@ -437,7 +438,7 @@ function quickScore(pid,score){
 async function deleteEvent(eid){const ok=await confirmDialog('删除这条记录？');if(!ok)return;data.events=data.events.filter(e=>e.id!==eid);undoStack=undoStack.filter(id=>id!==eid);save();render();toast('已删除')}
 async function removeCategory(cat){if(cat==='其他'){toast('默认分类不可删除');return}const ok=await confirmDialog('删除分类「'+cat+'」？已有事件会归为「其他」');if(!ok)return;const cats=data.settings.categories;const i=cats.indexOf(cat);if(i>-1)cats.splice(i,1);data.events.forEach(e=>{if(e.category===cat)e.category='其他'});if(currentCategory===cat)currentCategory='其他';save();toast('已删除「'+cat+'」');render()}
 
-function selectPerson(id){selectedPersonId=id;renderRecordForm()}
+function selectPerson(id){selectedPersonId=id;renderRecord()}
 function setScore(val){currentScore=val;$('#custom-score').value=val;renderScorePresets();updateSaveBtn()}
 function setCustomScore(val){const n=parseInt(val);currentScore=isNaN(n)?null:n;renderScorePresets();updateSaveBtn()}
 function updateSaveBtn(){$('#save-btn').disabled=!(selectedPersonId&&currentScore!==null&&currentScore!==0)}
@@ -482,7 +483,7 @@ function sparkline(pid){
 // ═══ Trend Chart ════════════════
 function trendChart(pid){
   const evts=data.events.filter(e=>e.personId===pid).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
-  if(evts.length<2)return'';let cum=0;const pts=evts.map(e=>{cum+=e.score;return{cum,score:e.score,date:e.createdAt}});
+  if(evts.length<2)return`<div class="chart-wrap" style="text-align:center;padding:32px 12px;color:var(--text3);font-size:13px;">📈 ${evts.length===0?'记录事件后出现趋势图':'再记一条就能看到趋势'}</div>`;let cum=0;const pts=evts.map(e=>{cum+=e.score;return{cum,score:e.score,date:e.createdAt}});
   const cv=pts.map(p=>p.cum),minC=Math.min(0,...cv),maxC=Math.max(0,...cv),range=maxC-minC||1;
   const W=300,H=150,px=38,py=16,pr=10,pb=22,pW=W-px-pr,pH=H-py-pb,n=pts.length;
   pts.forEach((p,i)=>{p.x=px+(i/Math.max(n-1,1))*pW;p.y=py+((maxC-p.cum)/range)*pH});
@@ -532,11 +533,11 @@ function renderPeople(){
   const gs=getGroups();$('#group-filter').innerHTML=gs.map(g=>`<span class="filter-chip${groupFilter===g?' active':''}" data-g="${g}">${g}</span>`).join('');
   $('#group-filter').querySelectorAll('.filter-chip').forEach(ch=>{ch.onclick=()=>{groupFilter=ch.dataset.g;renderPeople()}});
   let filtered=groupFilter==='全部'?[...ppl]:ppl.filter(p=>(p.group||'其他')===groupFilter);filtered.sort((a,b)=>getScore(b.id)-getScore(a.id));
-  const qs=data.settings.quickScore||5,qv=qs===1?'±1':qs===3?'±3':qs===10?'±10':'±5';
+  const qs=data.settings.quickScore||5;
   $('#people-list').innerHTML=filtered.map(p=>{
-    const sc=getScore(p.id),scls=scoreClass(sc),last=getLastEvent(p.id),grp=p.group||'其他';
+    const sc=getScore(p.id),scls=scoreClass(sc),last=getLastEvent(p.id),grp=p.group||'其他',n=getEvents(p.id).length;
     return`<div class="card person-card" data-pid="${p.id}">
-      <div class="avatar">${p.name[0]}</div><div class="person-info"><div class="person-name">${esc(p.name)}${grp!=='其他'?`<span class="person-group-tag">#${esc(grp)}</span>`:''}</div><div class="person-last-event">${esc(last?last.note:'暂无记录')}</div></div>
+      <div class="avatar">${p.name[0]}</div><div class="person-info"><div class="person-name">${esc(p.name)}${grp!=='其他'?`<span class="person-group-tag">#${esc(grp)}</span>`:''}</div><div class="person-last-event">${n?n+' 条 · '+esc(last?last.note:''):'暂无记录'}</div></div>
       ${sparkline(p.id)}<div class="person-score-wrap"><span class="person-score ${scls}">${scoreText(sc)}</span></div>
       <div class="quick-btns"><button class="quick-btn plus" data-pid="${p.id}" data-q="1">${scoreText(qs)}</button><button class="quick-btn minus" data-pid="${p.id}" data-q="-1">${qs>0?'-'+qs:qs}</button></div>
     </div>`}).join('');
@@ -550,7 +551,8 @@ function renderDetail(part){
   const full=part!=='events';
   if(full){
     const sc=getScore(detailPersonId);
-    $('.detail-person-name').textContent=p.name;$('.detail-total-score').textContent=scoreText(sc);$('.detail-total-score').className='detail-total-score '+scoreClass(sc);
+    const n=getEvents(detailPersonId).length;
+    $('.detail-person-name').textContent=p.name+(n?` · ${n}条`:'');$('.detail-total-score').textContent=scoreText(sc);$('.detail-total-score').className='detail-total-score '+scoreClass(sc);
     renderPersonNote(p);$('#detail-chart').innerHTML=trendChart(detailPersonId);$('#detail-cat-stats').innerHTML=catStats(detailPersonId);
     $('#time-filter').innerHTML=['全部','本周','本月','三月'].map(t=>`<span class="filter-chip${timeFilter===t?' active':''}" data-t="${t}">${t}</span>`).join('');
     $('#time-filter').querySelectorAll('.filter-chip').forEach(ch=>{ch.onclick=()=>{timeFilter=ch.dataset.t;renderDetail()}});
@@ -637,7 +639,7 @@ function exportData(){
   const exp={people:data.people,events:data.events,settings:{theme:data.settings.theme,quickScore:data.settings.quickScore,categories:data.settings.categories,noteTemplates:data.settings.noteTemplates,groups:data.settings.groups,vibrate:data.settings.vibrate}};
   const b=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='人际记分备份_'+todayStr()+'.json';a.click();URL.revokeObjectURL(u);toast('已导出（不含密码）')
 }
-function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{const t=await f.text(),im=JSON.parse(t);if(!im.people||!im.events)throw new Error();const ok=await confirmDialog(`导入 ${im.people.length} 人、${im.events.length} 条记录？`);if(!ok)return;data.people=im.people;data.events=im.events;const hadPin=!!(im.settings&&im.settings.pin);data.settings=im.settings||{};data.settings.pin=null;if(!data.settings.theme)data.settings.theme='auto';if(!data.settings.quickScore)data.settings.quickScore=5;if(!data.settings.categories)data.settings.categories=[...DEF_CATS];if(!data.settings.noteTemplates)data.settings.noteTemplates=[...DEF_TMPLS];if(!data.settings.groups)data.settings.groups=[...DEF_GROUPS];if(data.settings.vibrate===undefined)data.settings.vibrate=true;data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});data.people.forEach(p=>{if(!p.group||!data.settings.groups.includes(p.group))p.group='其他';if(p.note===undefined)p.note=''});selectedPersonId=data.people.length>0?data.people[0].id:null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('导入成功'+(hadPin?'（密码已移除）':''))}catch(e){toast('文件格式错误')}};inp.click()}
+function importData(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{const t=await f.text(),im=JSON.parse(t);if(!im.people||!im.events)throw new Error();im.events=im.events.filter(e=>typeof e.score==='number'&&e.personId&&e.createdAt);im.people=im.people.filter(p=>p.id&&p.name);const ok=await confirmDialog(`导入 ${im.people.length} 人、${im.events.length} 条记录？`);if(!ok)return;data.people=im.people;data.events=im.events;const hadPin=!!(im.settings&&im.settings.pin);data.settings=im.settings||{};data.settings.pin=null;if(!data.settings.theme)data.settings.theme='auto';if(!data.settings.quickScore)data.settings.quickScore=5;if(!data.settings.categories)data.settings.categories=[...DEF_CATS];if(!data.settings.noteTemplates)data.settings.noteTemplates=[...DEF_TMPLS];if(!data.settings.groups)data.settings.groups=[...DEF_GROUPS];if(data.settings.vibrate===undefined)data.settings.vibrate=true;data.events.forEach(e=>{if(!e.category)e.category='其他';if(e.reflection===undefined)e.reflection=''});data.people.forEach(p=>{if(!p.group||!data.settings.groups.includes(p.group))p.group='其他';if(p.note===undefined)p.note=''});selectedPersonId=data.people.length>0?data.people[0].id:null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('导入成功'+(hadPin?'（密码已移除）':''))}catch(e){toast('文件格式错误')}};inp.click()}
 async function resetAll(){const ok=await confirmDialog('清除全部数据？不可恢复！');if(!ok)return;data={people:[],events:[],settings:{pin:null,theme:data.settings.theme,quickScore:data.settings.quickScore,categories:[...DEF_CATS],noteTemplates:[...DEF_TMPLS],groups:[...DEF_GROUPS],vibrate:data.settings.vibrate}};selectedPersonId=null;currentScore=null;detailPersonId=null;undoStack=[];applyTheme();save();render();toast('已清除')}
 async function setupPin(){if(data.settings.pin){const ok=await confirmDialog('已设置密码，修改？','修改','modal-primary');if(!ok)return}showPinScreen('setup')}
 async function removePin(){const ok=await confirmDialog('移除密码？');if(!ok)return;data.settings.pin=null;save();updatePinBtn();toast('密码已移除')}
@@ -647,7 +649,7 @@ window._goSettings=()=>switchTab('settings');
 function bind(){
   $$('.tab-btn').forEach(b=>{b.onclick=()=>switchTab(b.dataset.tab)});$('.back-btn').onclick=goBack;$('#save-btn').onclick=handleSaveEvent;
   $('#custom-score').oninput=function(){if(this.value===''||this.value==='-'){currentScore=null;updateSaveBtn();renderScorePresets();return}setCustomScore(this.value)};
-  $('#note-input').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('#custom-score').focus()}};
+  $('#note-input').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('#reflection-input').focus()}};$('#reflection-input').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('#custom-score').focus()}};
   $('#add-person-btn').onclick=()=>{addPerson($('#new-person-input').value);$('#new-person-input').value=''};$('#new-person-input').onkeydown=function(e){if(e.key==='Enter'){addPerson(this.value);this.value=''}};$('#export-btn').onclick=exportData;$('#import-btn').onclick=importData;$('#reset-btn').onclick=resetAll;
   $$('#theme-row .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.theme=o.dataset.theme;applyTheme();save();renderSettings()}});
   $$('#qscore-row .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.quickScore=parseInt(o.dataset.v);save();toast('快捷分值 ±'+o.dataset.v);renderSettings()}});
