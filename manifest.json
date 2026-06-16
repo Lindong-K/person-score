@@ -1,0 +1,10 @@
+{
+  "name": "人际记分",
+  "short_name": "人际记分",
+  "description": "记录人际行为，评估关系价值",
+  "start_url": "/person-score/",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#007AFF",
+  "lang": "zh-CN"
+}
