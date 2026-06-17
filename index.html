@@ -178,6 +178,10 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 .reader-meta{font-size:12px;color:var(--text3);margin-bottom:14px}
 .reader-content{font-size:22px;line-height:1.8;word-break:break-all;color:var(--text);white-space:pre-wrap}
 .reader-close{display:block;width:100%;height:44px;margin-top:16px;border:none;border-radius:10px;background:var(--bg);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.voice-wrap{position:relative}.voice-wrap .note-textarea{padding-right:42px}
+.voice-btn{position:absolute;right:6px;bottom:8px;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--text2);z-index:2}
+.voice-btn:active{transform:scale(0.9)}.voice-btn.recording{background:var(--negative);border-color:var(--negative);color:#fff;animation:voicePulse 1s infinite}.voice-btn:disabled{opacity:0.3;pointer-events:none}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.4)}50%{box-shadow:0 0 0 10px rgba(255,59,48,0)}}
 .event-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
 .event-cat-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--primaryLight);color:var(--primary);font-weight:600}
 .event-date{font-size:11px;color:var(--text2)}
@@ -291,9 +295,9 @@ main{flex:1;overflow-y:auto;padding:20px 16px 90px;-webkit-overflow-scrolling:to
 <div class="screen-title">记录事件</div>
 <div id="person-list"></div>
 <div class="section-label">发生日期</div><input type="date" id="event-date" class="date-input">
-<div class="section-label">事件备注</div><div style="position:relative;"><textarea id="note-input" class="note-textarea" placeholder="TA做了什么...（可选）" autocomplete="off"></textarea><div class="ac-dropdown" id="ac-dropdown"></div></div>
+<div class="section-label">事件备注</div><div class="voice-wrap"><textarea id="note-input" class="note-textarea" placeholder="TA做了什么...（可选）" autocomplete="off"></textarea><button class="voice-btn" id="voice-note-btn" title="语音输入">🎤</button><div class="ac-dropdown" id="ac-dropdown"></div></div>
 <div id="tmpl-chips" class="tmpl-chips"></div>
-<div class="section-label">我的看法</div><textarea id="reflection-input" class="note-textarea note-reflection" placeholder="你怎么看这件事...（可选）" maxlength="2000" style="min-height:44px;"></textarea>
+<div class="section-label">我的看法</div><div class="voice-wrap"><textarea id="reflection-input" class="note-textarea" placeholder="你怎么看这件事...（可选）" maxlength="2000" style="min-height:44px;"></textarea><button class="voice-btn" id="voice-reflection-btn" title="语音输入">🎤</button></div>
 <div class="section-label">情绪</div><div class="emoji-row" id="emoji-row"></div>
 <div class="section-label">分类标签</div><div id="cat-chips" class="cat-chips"></div>
 <div class="section-label">评分</div>
@@ -389,7 +393,7 @@ let currentTab='record',detailPersonId=null,selectedPersonId=null,undoStack=[];
 let currentScore=null,currentCategory='其他',pinMode=null,pinEntry='',pinFirst='';
 let unlocked=sessionStorage.getItem('ps_u')==='1',toastTimer=null,_searchTimer=null,_notifyTimer=null;
 let searchQuery='',timeFilter='全部',groupFilter='全部',_peopleSearch='',_dataCorrupted=false,_rankView=false,_currentEmoji='';
-let _scoreCache=null,_eventsCache=null,_lastTouch=0;
+let _scoreCache=null,_eventsCache=null,_lastTouch=0,_recognition=null,_voiceTarget=null,_voiceBase='';
 
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
@@ -837,6 +841,32 @@ function renderSettings(){
 
 function esc(s){if(!s)return'';const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};return s.replace(/[&<>"']/g,c=>m[c])}
 
+// ═══ Voice Input ════════════════
+function initVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){$$('.voice-btn').forEach(b=>{b.disabled=true;b.title='浏览器不支持语音输入'});return}
+  _recognition=new SR();_recognition.lang='zh-CN';_recognition.interimResults=true;_recognition.maxAlternatives=1;
+  _recognition.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)final+=t;else interim+=t}
+    if(final){_voiceBase=(_voiceBase+' '+final).trim()}
+    if(_voiceTarget)_voiceTarget.value=(_voiceBase+' '+(interim||'')).trim();
+  };
+  _recognition.onerror=e=>{stopVoice();if(e.error==='not-allowed')toast('请允许麦克风权限');else if(e.error!=='aborted')toast('语音识别出错')};
+  _recognition.onend=()=>stopVoice();
+}
+function startVoice(inputEl){
+  if(!_recognition){toast('浏览器不支持语音输入');return}
+  if(_voiceTarget){stopVoice();return}
+  _voiceBase=inputEl.value;_voiceTarget=inputEl;
+  try{_recognition.start()}catch(e){stopVoice();return}
+  const btn=inputEl.closest('.voice-wrap').querySelector('.voice-btn');if(btn)btn.classList.add('recording');
+}
+function stopVoice(){
+  if(_voiceTarget){const btn=_voiceTarget.closest('.voice-wrap').querySelector('.voice-btn');if(btn)btn.classList.remove('recording');_voiceTarget=null}
+  try{_recognition.stop()}catch(e){}
+}
+
 // ═══ Export/Import ══════════════
 function save(){
   _scoreCache=null;_eventsCache=null;
@@ -955,6 +985,7 @@ function bind(){
   $('#note-input').oninput=function(){updateAutocomplete(this.value.trim())};
   $('#note-input').onblur=()=>{setTimeout(()=>$('#ac-dropdown').classList.remove('show'),150)};
   $('#reflection-input').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('#custom-score').focus()}};
+  $('#voice-note-btn').onclick=function(){startVoice($('#note-input'))};$('#voice-reflection-btn').onclick=function(){startVoice($('#reflection-input'))};
   $('#add-person-btn').onclick=()=>{addPerson($('#new-person-input').value);$('#new-person-input').value=''};$('#new-person-input').onkeydown=function(e){if(e.key==='Enter'){addPerson(this.value);this.value=''}};$('#export-btn').onclick=exportData;$('#import-btn').onclick=importData;$('#sync-out-btn').onclick=syncOut;$('#sync-in-btn').onclick=showSyncIn;$('#sync-apply-btn').onclick=syncApply;$('#reset-btn').onclick=resetAll;
   $$('#theme-row .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.theme=o.dataset.theme;applyTheme();save();renderSettings()}});
   $$('#qscore-row .theme-opt').forEach(o=>{o.onclick=()=>{data.settings.quickScore=parseInt(o.dataset.v);save();toast('快捷分值 ±'+o.dataset.v);renderSettings()}});
@@ -976,7 +1007,7 @@ function bind(){
   $('#add-group-btn').onclick=()=>{const v=$('#new-group-input').value.trim();if(!v)return;const gs=data.settings.groups;if(gs.includes(v)){toast('已存在');return}gs.push(v);save();toast('已添加');renderSettings()};
 }
 
-function init(){load();applyTheme();initPinScreen();if(data.people.length===1)selectedPersonId=data.people[0].id;if(data.settings.pin&&!unlocked){bind();showPinScreen('enter')}else{bind();render();if(_dataCorrupted)setTimeout(()=>toast('数据损坏，已重置'),200);setupNotification()}
+function init(){load();applyTheme();initPinScreen();if(data.people.length===1)selectedPersonId=data.people[0].id;if(data.settings.pin&&!unlocked){bind();initVoice();showPinScreen('enter')}else{bind();initVoice();render();if(_dataCorrupted)setTimeout(()=>toast('数据损坏，已重置'),200);setupNotification()}
 }
 init();
 })();
